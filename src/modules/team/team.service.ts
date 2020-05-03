@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
+import { Member } from 'modules/member/member.payload';
 import { MemberRepository } from 'modules/member/member.repository';
-import { populateLeaderboard } from 'modules/team/services/stackoverflow.service';
+// import { populateLeaderboard } from 'modules/team/services/stackoverflow.service';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamRepository } from './team.repository';
@@ -38,8 +39,14 @@ export class TeamService {
 
   async getLeaderboard(): Promise<Team[]> {
     const teamList = await this.teamRepository.getTeamList();
+    const memberList = teamList
+      .map((team: Team): Member[] => team.members)
+      .reduce((acc, current) => acc.concat(current), []);
 
-    await populateLeaderboard(teamList);
+    // await populateLeaderboard(teamList, memberList);
+
+    await this.teamRepository.save(teamList);
+    await this.memberRepository.save(memberList);
 
     return teamList.sort(
       (teamA: Team, teamB: Team): number => teamB.score - teamA.score,

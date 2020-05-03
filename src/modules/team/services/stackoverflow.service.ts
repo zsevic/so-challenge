@@ -6,11 +6,10 @@ const apiTag = (usernames: string): string => {
   return `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow`;
 };
 
-export async function populateLeaderboard(teamList: Team[]): Promise<void> {
-  const memberList = teamList
-    .map((team: Team): Member[] => team.members)
-    .reduce((acc, current) => acc.concat(current), []);
-
+export async function populateLeaderboard(
+  teamList: Team[],
+  memberList: Member[],
+): Promise<void> {
   const usernames = memberList
     .map((member: Member): number => member.username)
     .join(';');

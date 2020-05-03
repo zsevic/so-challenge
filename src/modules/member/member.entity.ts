@@ -26,7 +26,7 @@ export class MemberEntity {
   @Column({
     unique: true,
   })
-  username: string;
+  username: number;
 
   @ManyToOne(
     () => TeamEntity,

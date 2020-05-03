@@ -5,7 +5,7 @@ export class Member {
 
   name: string;
 
-  username: string;
+  username: number;
 
   score?: number;
 }

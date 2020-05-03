@@ -1,4 +1,4 @@
-# nestjs-starter
+# so-challenge
 
 > Minimal NestJS boilerplate
 
@@ -7,8 +7,8 @@
 ### Setup
 
 ```bash
-git clone https://github.com/zsevic/nestjs-starter
-cd nestjs-starter
+git clone https://github.com/zsevic/so-challenge
+cd so-challenge
 cp .env.sample .env # change values after copying
 npm i
 npm run start:dev
@@ -56,4 +56,4 @@ API documentation is generated using [@nestjs/swagger](https://www.npmjs.com/pac
 
 ### Technologies used
 
-* Node.js, TypeScript, NestJS, TypeORM
+- Node.js, TypeScript, NestJS, TypeORM

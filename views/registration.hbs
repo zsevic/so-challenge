@@ -8,47 +8,51 @@
   <h1 class="lead text-center mt-2">Registration</h1>
   <div class="row justify-content-center">
     <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
-      <form class="text-center border border-light p-5" action="#!">
+      <form class="text-center border border-light p-5" id="registration-form">
         <p class="text-left">Team name</p>
-        <input type="text" class="form-control mb-4" placeholder="Team name" required>
+        <input type="text" class="form-control mb-4" placeholder="Team name" name="name" required value="temm">
 
         <p class="text-left">First member</p>
         <div class="form-row mb-4">
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Name" required>
+            <input type="text" class="form-control" placeholder="Name" name="members[0][name]" required value="mdek">
           </div>
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow username" required>
+            <input type="number" class="form-control" placeholder="Stackoverflow username" name="members[0][username]"
+              required value="424115">
           </div>
         </div>
 
         <p class="text-left">Second member</p>
         <div class="form-row mb-4">
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Name" required>
+            <input type="text" class="form-control" placeholder="Name" name="members[1][name]" required value="odeoo">
           </div>
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow username" required>
+            <input type="number" class="form-control" placeholder="Stackoverflow username" name="members[1][username]"
+              required value="8381115">
           </div>
         </div>
 
         <p class="text-left">Third member</p>
         <div class="form-row mb-4">
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Name" required>
+            <input type="text" class="form-control" placeholder="Name" name="members[2][name]" required value="ldldld">
           </div>
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow username" required>
+            <input type="number" class="form-control" placeholder="Stackoverflow username" name="members[2][username]"
+              required value="414115">
           </div>
         </div>
 
         <p class="text-left">Fourth member</p>
         <div class="form-row mb-4">
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Name" required>
+            <input type="text" class="form-control" placeholder="Name" name="members[3][name]" required value="pddpds">
           </div>
           <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow username" required>
+            <input type="number" class="form-control" placeholder="Stackoverflow username" name="members[3][username]"
+              required value="313115">
           </div>
         </div>
 

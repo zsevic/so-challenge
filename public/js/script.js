@@ -8,7 +8,7 @@ $(REGISTRATION_FORM).on('submit', event => {
     type: 'POST',
     success: () => {
       alert('Successfully registered');
-      $(REGISTRATION_FORM).reset();
+      $(REGISTRATION_FORM).trigger('reset');
     },
     error: () => {
       alert('Registration failed');

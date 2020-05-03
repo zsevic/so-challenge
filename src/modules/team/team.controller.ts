@@ -31,9 +31,7 @@ export class TeamController {
   }
 
   @Post('teams')
-  @Render('registration')
-  async registerTeam(@Body() teamDto: CreateTeamDto) {
-    await this.teamService.createTeam(teamDto);
-    return { title: 'SO challenge - registration', page: 'registration' };
+  async registerTeam(@Body() teamDto: CreateTeamDto): Promise<Team> {
+    return this.teamService.createTeam(teamDto);
   }
 }

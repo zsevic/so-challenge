@@ -20,8 +20,30 @@
           {{#each teams as |team|}}
           <tr>
             <th scope="row">{{inc @index}}</th>
-            <td>{{team.name}}</td>
-            <td>{{team.score}}</td>
+            <td>
+              <table class="table">
+                <p class="lead text-primary">{{team.name}}</p>
+                <tbody>
+                  {{#each team.members as |member|}}
+                  <tr>
+                    <td class="text-muted">{{member.name}} {{member.username}}</td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <table class="table">
+                <p class="lead text-primary">{{team.score}}</p>
+                <tbody>
+                  {{#each team.members as |member|}}
+                  <tr>
+                    <td class="text-muted">{{member.score}}</td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </td>
           </tr>
           {{/each}}
         </tbody>

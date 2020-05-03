@@ -3,9 +3,9 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
-import * as hbs from 'hbs';
 import { AppModule } from 'modules/app/app.module';
-import { setupSwagger } from 'common/config/api-docs';
+import { setupApiDocs } from 'common/config/api-docs';
+import { setupTemplateEngine } from 'common/config/template-engine';
 import { AllExceptionsFilter } from 'common/filters';
 import { loggerMiddleware } from 'common/middlewares';
 import { CustomValidationPipe } from 'common/pipes';
@@ -20,8 +20,7 @@ async function bootstrap(): Promise<void> {
     origin: configService.get('CLIENT_URL'),
   });
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  hbs.registerPartials(join(__dirname, '..', 'views/partials'));
-  hbs.registerHelper('inc', value => parseInt(value) + 1);
+  setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');
   app.use(cookieParser());
   app.use(loggerMiddleware);
@@ -34,7 +33,7 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  setupSwagger(app);
+  setupApiDocs(app);
 
   await app.listen(configService.get('PORT')).then(() => {
     logger.log(`Server is running on port ${configService.get('PORT')}`);

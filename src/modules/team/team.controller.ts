@@ -13,7 +13,7 @@ export class TeamController {
   @Render('leaderboard')
   async leaderboard() {
     const teams = await this.teamService.getLeaderboard();
-    return { teams, title: 'SO challenge - Leaderboard' };
+    return { teams, title: 'SO challenge - Leaderboard', page: 'leaderboard' };
   }
 
   @Get('teams')
@@ -24,7 +24,11 @@ export class TeamController {
   @Get('registration')
   @Render('registration')
   async registration() {
-    return { message: 'registration', title: 'Registration' };
+    return {
+      message: 'registration',
+      title: 'SO challenge - Registration',
+      page: 'registration',
+    };
   }
 
   @Post('teams')

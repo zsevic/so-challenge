@@ -7,6 +7,6 @@ export default registerAs('database', () => ({
   logging: false,
   migrations: ['dist/database/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
-  synchronize: false,
+  synchronize: true,
   type: 'sqlite',
 }));

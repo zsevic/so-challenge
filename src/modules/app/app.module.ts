@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from 'common/config';
 import databaseConfig from 'common/config/database';
 import { EventsModule } from 'common/events/events.module';
+import { TeamModule } from 'modules/team/team.module';
 import { AppController } from './app.controller';
 
 const typeOrmConfig = {
@@ -35,6 +36,7 @@ const typeOrmConfig = {
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
     EventsModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [

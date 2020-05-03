@@ -1,5 +1,7 @@
+import { join } from 'path';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from 'modules/app/app.module';
 import { setupSwagger } from 'common/config/api-docs';
@@ -8,7 +10,7 @@ import { loggerMiddleware } from 'common/middlewares';
 import { CustomValidationPipe } from 'common/pipes';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger(bootstrap.name);
   const configService = app.get('configService');
 
@@ -16,6 +18,8 @@ async function bootstrap(): Promise<void> {
     credentials: true,
     origin: configService.get('CLIENT_URL'),
   });
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
   app.use(cookieParser());
   app.use(loggerMiddleware);
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -26,6 +30,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
     }),
   );
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   setupSwagger(app);
 
   await app.listen(configService.get('PORT')).then(() => {

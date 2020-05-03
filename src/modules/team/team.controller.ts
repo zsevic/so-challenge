@@ -25,7 +25,6 @@ export class TeamController {
   @Render('registration')
   async registration() {
     return {
-      message: 'registration',
       title: 'SO challenge - Registration',
       page: 'registration',
     };

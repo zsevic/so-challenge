@@ -11,6 +11,11 @@ export class TeamEntity {
   })
   name: string;
 
+  @Column({
+    default: 0,
+  })
+  score: number;
+
   @OneToMany(
     () => MemberEntity,
     memberEntity => memberEntity.team,

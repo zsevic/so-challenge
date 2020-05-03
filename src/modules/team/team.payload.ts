@@ -8,4 +8,6 @@ export class Team {
 
   @Type(() => Member)
   members: Member[];
+
+  score?: number;
 }

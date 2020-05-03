@@ -9,6 +9,11 @@ import { TeamService } from './team.service';
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
+  @Get('leaderboard')
+  async getLeaderboard(): Promise<Team[]> {
+    return this.teamService.getLeaderboard();
+  }
+
   @Get()
   async getTeamList(): Promise<Team[]> {
     return this.teamService.getTeamList();

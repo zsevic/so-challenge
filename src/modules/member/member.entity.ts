@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { TeamEntity } from 'modules/team/team.entity';
 
@@ -34,4 +36,10 @@ export class MemberEntity {
   )
   @JoinColumn({ name: 'team_id' })
   team: TeamEntity;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

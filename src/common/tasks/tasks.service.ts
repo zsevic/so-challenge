@@ -5,8 +5,8 @@ import { Interval } from '@nestjs/schedule';
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
-  @Interval(2000)
+  @Interval(10000)
   handleCron() {
-    this.logger.debug('Called every 2 seconds');
+    this.logger.debug('Called every 10 seconds');
   }
 }

@@ -13,7 +13,15 @@ export class TeamController {
   @Render('leaderboard')
   async leaderboard() {
     const teams = await this.teamService.getLeaderboard();
-    return { teams, title: 'SO challenge - Leaderboard', page: 'leaderboard' };
+    const updated_at = teams?.[0].updated_at
+      ? new Date(teams[0].updated_at).toLocaleString()
+      : new Date().toLocaleString();
+    return {
+      teams,
+      title: 'SO challenge - Leaderboard',
+      page: 'leaderboard',
+      updated_at,
+    };
   }
 
   @Get('teams')

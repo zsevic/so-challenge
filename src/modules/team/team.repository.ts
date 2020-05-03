@@ -8,7 +8,9 @@ import { Team } from './team.payload';
 export class TeamRepository extends Repository<TeamEntity> {
   async createTeam(name: string, manager: EntityManager): Promise<Team> {
     const team = await manager.save(TeamEntity, { name }).catch(() => {
-      throw new BadRequestException('Team name is taken');
+      throw new BadRequestException(
+        `Team with name ${name} is already registered`,
+      );
     });
 
     return plainToClass(Team, team);

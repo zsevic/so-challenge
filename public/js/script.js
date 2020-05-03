@@ -10,8 +10,8 @@ $(REGISTRATION_FORM).on('submit', event => {
       alert('Successfully registered');
       $(REGISTRATION_FORM).reset();
     },
-    error: err => {
-      alert(err.responseJSON.message);
+    error: () => {
+      alert('Registration failed');
     },
   });
 });

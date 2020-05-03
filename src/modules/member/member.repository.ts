@@ -17,7 +17,7 @@ export class MemberRepository extends Repository<MemberEntity> {
       .values(memberList)
       .execute()
       .catch(() => {
-        throw new BadRequestException('Member username is taken');
+        throw new BadRequestException('Member usernames are not valid');
       });
     const newMembers = memberList.map(
       (member: Member, index): Member => ({

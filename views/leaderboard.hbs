@@ -5,7 +5,7 @@
 
 <body>
   {{>nav}}
-  <h1 class="lead text-center mt-2">Leaderboard (last updated at {{updated_at}})</h1>
+  <h1 class="lead text-center mt-2">Leaderboard {{#if updated_at}}(last updated at {{updated_at}}){{/if}}</h1>
   <div class="row justify-content-center">
     <div class="col-xs-12 col-sm-8">
       <table class="table">

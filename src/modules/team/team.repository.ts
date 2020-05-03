@@ -17,6 +17,9 @@ export class TeamRepository extends Repository<TeamEntity> {
   async getTeamList(): Promise<Team[]> {
     const teamList = await this.find({
       relations: ['members'],
+      order: {
+        score: 'DESC',
+      },
     });
 
     return plainToClass(Team, teamList);

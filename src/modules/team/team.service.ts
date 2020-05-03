@@ -38,19 +38,15 @@ export class TeamService {
   }
 
   async getLeaderboard(): Promise<Team[]> {
-    const teamList = await this.teamRepository.getTeamList();
-    const memberList = teamList
-      .map((team: Team): Member[] => team.members)
-      .reduce((acc, current) => acc.concat(current), []);
+    return this.teamRepository.getTeamList();
+    // const memberList = teamList
+    //   .map((team: Team): Member[] => team.members)
+    //   .reduce((acc, current) => acc.concat(current), []);
 
     // await populateLeaderboard(teamList, memberList);
 
-    await this.teamRepository.save(teamList);
-    await this.memberRepository.save(memberList);
-
-    return teamList.sort(
-      (teamA: Team, teamB: Team): number => teamB.score - teamA.score,
-    );
+    // await this.teamRepository.save(teamList);
+    // await this.memberRepository.save(memberList);
   }
 
   async getTeamList(): Promise<Team[]> {

@@ -9,20 +9,16 @@ import { TeamService } from './team.service';
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
-  @Get('teams/leaderboard')
-  async getLeaderboard(): Promise<Team[]> {
-    return this.teamService.getLeaderboard();
+  @Get('leaderboard')
+  @Render('leaderboard')
+  async leaderboard() {
+    const teams = await this.teamService.getLeaderboard();
+    return { teams, title: 'SO challenge - Leaderboard' };
   }
 
   @Get('teams')
   async getTeamList(): Promise<Team[]> {
     return this.teamService.getTeamList();
-  }
-
-  @Get('leaderboard')
-  @Render('leaderboard')
-  async leaderboard() {
-    return { message: 'leaderboard', title: 'Leaderboard' };
   }
 
   @Get('registration')

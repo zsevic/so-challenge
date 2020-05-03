@@ -21,6 +21,7 @@ async function bootstrap(): Promise<void> {
   });
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
+  hbs.registerHelper('inc', value => parseInt(value) + 1);
   app.setViewEngine('hbs');
   app.use(cookieParser());
   app.use(loggerMiddleware);

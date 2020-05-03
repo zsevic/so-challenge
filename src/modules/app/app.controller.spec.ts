@@ -2,18 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 
 describe('AppController', () => {
-  let app: TestingModule;
+  let controller: AppController;
 
   beforeEach(async () => {
-    app = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
     }).compile();
+
+    controller = module.get<AppController>(AppController);
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      const appController = app.get<AppController>(AppController);
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should be defined', () => {
+      expect(controller).toBeDefined();
     });
   });
 });

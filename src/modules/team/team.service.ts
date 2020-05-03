@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { Member } from 'modules/member/member.payload';
+// import { Member } from 'modules/member/member.payload';
 import { MemberRepository } from 'modules/member/member.repository';
 // import { populateLeaderboard } from 'modules/team/services/stackoverflow.service';
 import { CreateTeamDto } from './dto';

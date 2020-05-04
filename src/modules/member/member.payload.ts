@@ -3,9 +3,11 @@ export class Member {
 
   team_id?: string;
 
+  link?: string;
+
   name: string;
 
-  username: number;
-
   score?: number;
+
+  username: number;
 }

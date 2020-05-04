@@ -33,6 +33,7 @@ export async function populateLeaderboard(
     const member = members[answer.owner.user_id];
     if (member.name.localeCompare(answer.owner.display_name) === 0) {
       member.score += answer.score;
+      member.link = answer.owner.link;
       teams[member.team_id].score += answer.score;
     }
   });

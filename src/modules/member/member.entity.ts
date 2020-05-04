@@ -17,6 +17,11 @@ export class MemberEntity {
   @Column()
   team_id: string;
 
+  @Column({
+    default: '',
+  })
+  link: string;
+
   @Column()
   name: string;
 

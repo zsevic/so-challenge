@@ -1,12 +1,25 @@
 import { registerAs } from '@nestjs/config';
 
-export default registerAs('database', () => ({
-  database: 'database.sqlite',
+const options = {
   entities: ['dist/**/**.entity{.ts,.js}'],
   keepConnectionAlive: true,
   logging: false,
   migrations: ['dist/database/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
-  synchronize: false,
-  type: 'sqlite',
-}));
+};
+
+export default registerAs('database', () =>
+  process.env.NODE_ENV === 'production'
+    ? {
+        ...options,
+        synchronize: true,
+        type: 'postgres',
+        url: process.env.DATABASE_URL,
+      }
+    : {
+        ...options,
+        synchronize: false,
+        database: 'database.sqlite',
+        type: 'sqlite',
+      },
+);

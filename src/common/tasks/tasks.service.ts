@@ -18,9 +18,9 @@ export class TasksService {
     private readonly teamRepository: TeamRepository,
   ) {}
 
-  @Interval(60000)
+  @Interval(600000)
   async handleCron() {
-    this.logger.debug('Called every 1 minute');
+    this.logger.debug('Called every 10 minutes');
     const teamList = await this.teamRepository.getTeamList();
     const memberList = teamList
       .map((team: Team): Member[] => team.members)

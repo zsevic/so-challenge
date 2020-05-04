@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
     credentials: true,
     origin: configService.get('CLIENT_URL'),
   });
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');
   app.use(cookieParser());
@@ -32,7 +32,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
     }),
   );
-  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useStaticAssets(join(__dirname, '../..', 'public'));
   setupApiDocs(app);
 
   await app.listen(configService.get('PORT')).then(() => {

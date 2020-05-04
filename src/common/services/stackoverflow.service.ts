@@ -31,7 +31,9 @@ export async function populateLeaderboard(
 
   result.data.items.forEach((answer): void => {
     const member = members[answer.owner.user_id];
-    member.score += answer.score;
-    teams[member.team_id].score += answer.score;
+    if (member.name.localeCompare(answer.owner.display_name) === 0) {
+      member.score += answer.score;
+      teams[member.team_id].score += answer.score;
+    }
   });
 }

@@ -17,10 +17,12 @@ export async function populateLeaderboard(
   const members = {};
   memberList.forEach((member: Member): void => {
     members[member.username] = member;
+    members[member.username].score = 0;
   });
   const teams = {};
   teamList.forEach((team: Team): void => {
     teams[team.id] = team;
+    teams[team.id].score = 0;
   });
 
   const apiUrl = apiTag(usernames);

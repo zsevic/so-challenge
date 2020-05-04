@@ -13,14 +13,23 @@ export class TeamController {
   @Render('leaderboard')
   async leaderboard() {
     const teams = await this.teamService.getLeaderboard();
-    const updated_at = teams?.[0]?.updated_at
-      ? new Date(teams[0].updated_at).toLocaleString()
-      : false;
+    let lastUpdate = '';
+    if (teams.length > 0) {
+      const lastUpdatedTeam = teams.reduce(
+        (acc: Team, current: Team): Team =>
+          new Date(acc.updated_at).getTime() <
+          new Date(current.updated_at).getTime()
+            ? current
+            : acc,
+      );
+      lastUpdate = new Date(lastUpdatedTeam.updated_at).toLocaleString();
+    }
+
     return {
       teams,
       title: 'SO challenge - Leaderboard',
       page: 'leaderboard',
-      updated_at,
+      updated_at: lastUpdate,
     };
   }
 

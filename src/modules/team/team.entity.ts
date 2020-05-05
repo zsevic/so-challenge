@@ -20,6 +20,7 @@ export class TeamEntity {
 
   @Column({
     default: 0,
+    type: 'int',
   })
   score: number;
 

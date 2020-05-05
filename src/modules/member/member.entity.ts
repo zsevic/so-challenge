@@ -18,7 +18,7 @@ export class MemberEntity {
   team_id: string;
 
   @Column({
-    default: '',
+    nullable: true,
   })
   link: string;
 
@@ -27,11 +27,13 @@ export class MemberEntity {
 
   @Column({
     default: 0,
+    type: 'int',
   })
   score: number;
 
   @Column({
     unique: true,
+    type: 'int',
   })
   username: number;
 

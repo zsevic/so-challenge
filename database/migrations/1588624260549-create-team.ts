@@ -9,6 +9,9 @@ export class CreateTeam1588624260549 implements MigrationInterface {
           {
             name: 'id',
             type: 'uuid',
+            default: 'uuid_generate_v4()',
+            generationStrategy: 'uuid',
+            isGenerated: true,
             isPrimary: true,
           },
           {
@@ -17,15 +20,18 @@ export class CreateTeam1588624260549 implements MigrationInterface {
           },
           {
             name: 'score',
-            type: 'number',
+            type: 'int',
+            default: 0,
           },
           {
             name: 'created_at',
             type: 'Date',
+            default: 'current_timestamp',
           },
           {
             name: 'updated_at',
             type: 'Date',
+            default: 'current_timestamp',
           },
         ],
       }),

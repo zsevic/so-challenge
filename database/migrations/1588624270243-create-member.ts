@@ -9,6 +9,9 @@ export class CreateMember1588624270243 implements MigrationInterface {
           {
             name: 'id',
             type: 'uuid',
+            default: 'uuid_generate_v4()',
+            generationStrategy: 'uuid',
+            isGenerated: true,
             isPrimary: true,
           },
           {
@@ -18,6 +21,7 @@ export class CreateMember1588624270243 implements MigrationInterface {
           {
             name: 'link',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'name',
@@ -25,19 +29,22 @@ export class CreateMember1588624270243 implements MigrationInterface {
           },
           {
             name: 'score',
-            type: 'number',
+            type: 'int',
+            default: 0,
           },
           {
             name: 'username',
-            type: 'varchar',
+            type: 'int',
           },
           {
             name: 'created_at',
             type: 'Date',
+            default: 'current_timestamp',
           },
           {
             name: 'updated_at',
             type: 'Date',
+            default: 'current_timestamp',
           },
         ],
       }),

@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { EntityRepository, Repository, EntityManager } from 'typeorm';
 import { TeamEntity } from './team.entity';
@@ -6,12 +6,17 @@ import { Team } from './team.payload';
 
 @EntityRepository(TeamEntity)
 export class TeamRepository extends Repository<TeamEntity> {
+  private readonly logger = new Logger(TeamRepository.name);
+
   async createTeam(name: string, manager: EntityManager): Promise<Team> {
-    const team = await manager.save(TeamEntity, { name }).catch(() => {
-      throw new BadRequestException(
-        `Team with name ${name} is already registered`,
-      );
-    });
+    const team = await manager
+      .save(TeamEntity, { name })
+      .catch((err: Error): void => {
+        this.logger.error(err.message);
+        throw new BadRequestException(
+          `Team with name ${name} is already registered`,
+        );
+      });
 
     return plainToClass(Team, team);
   }

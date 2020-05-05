@@ -1,16 +1,29 @@
 module.exports = [
   {
-    name: 'migration',
+    name: 'migration-dev',
     type: 'sqlite',
     database: 'database.sqlite',
-    entities: ['dist/**/**.entity{.ts,.js}'],
+    entities: ['src/**/**.entity{.ts,.js}'],
     migrations: ['database/migrations/*{.ts,.js}'],
     migrationsTableName: 'migrations',
     cli: {
       migrationsDir: 'database/migrations',
     },
     logging: true,
-    synchronize: false
+    synchronize: false,
+  },
+  {
+    name: 'migration-prod',
+    type: 'postgres',
+    url: process.env.DATABASE_URL,
+    entities: ['src/**/**.entity{.ts,.js}'],
+    migrations: ['database/migrations/*{.ts,.js}'],
+    migrationsTableName: 'migrations',
+    cli: {
+      migrationsDir: 'database/migrations',
+    },
+    logging: true,
+    synchronize: false,
   },
   {
     name: 'seed',

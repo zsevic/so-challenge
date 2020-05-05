@@ -8,6 +8,9 @@ import { Member } from 'modules/member/member.payload';
 import { TeamEntity } from 'modules/team/team.entity';
 import { Team } from 'modules/team/team.payload';
 import { TeamRepository } from 'modules/team/team.repository';
+import { INTERVAL } from './tasks.constants';
+
+const INTERVAL_VALUE = INTERVAL * 60 * 1000;
 
 @Injectable()
 export class TasksService {
@@ -18,9 +21,9 @@ export class TasksService {
     private readonly teamRepository: TeamRepository,
   ) {}
 
-  @Interval(600000)
+  @Interval(INTERVAL_VALUE)
   async handleCron() {
-    this.logger.debug('Called every 10 minutes');
+    this.logger.debug(`Called every ${INTERVAL} minute(s)`);
     const teamList = await this.teamRepository.getTeamList();
     const memberList = teamList
       .map((team: Team): Member[] => team.members)
@@ -30,8 +33,14 @@ export class TasksService {
 
     await this.connection.transaction(
       async (manager: EntityManager): Promise<void> => {
-        await manager.save(TeamEntity, teamList);
-        await manager.save(MemberEntity, memberList);
+        await manager
+          .save(TeamEntity, teamList)
+          .then(() => console.log('team saved'))
+          .catch(err => console.error(err));
+        await manager
+          .save(MemberEntity, memberList)
+          .then(() => console.log('members saved'))
+          .catch(err => console.error(err));
         this.logger.log('Leaderboard is updated');
       },
     );

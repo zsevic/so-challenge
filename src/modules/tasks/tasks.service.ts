@@ -29,20 +29,22 @@ export class TasksService {
       .map((team: Team): Member[] => team.members)
       .reduce((acc, current) => acc.concat(current), []);
 
-    await populateLeaderboard(teamList, memberList);
+    try {
+      await populateLeaderboard(teamList, memberList);
 
-    await this.connection.transaction(
-      async (manager: EntityManager): Promise<void> => {
-        await manager
-          .save(TeamEntity, teamList)
-          .then(() => console.log('team saved'))
-          .catch(err => console.error(err));
-        await manager
-          .save(MemberEntity, memberList)
-          .then(() => console.log('members saved'))
-          .catch(err => console.error(err));
-        this.logger.log('Leaderboard is updated');
-      },
-    );
+      await this.connection.transaction(
+        async (manager: EntityManager): Promise<void> => {
+          await manager
+            .save(TeamEntity, teamList)
+            .then(() => this.logger.debug('team saved'));
+          await manager
+            .save(MemberEntity, memberList)
+            .then(() => this.logger.debug('members saved'));
+          this.logger.log('Leaderboard is updated');
+        },
+      );
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 }

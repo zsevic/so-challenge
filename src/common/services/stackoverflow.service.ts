@@ -1,4 +1,6 @@
+import { Logger } from '@nestjs/common';
 import axios from 'axios';
+import { TAGS } from 'common/config/constants';
 import {
   getAnswersUrl,
   getQuestionUrl,
@@ -11,12 +13,12 @@ import {
 } from 'common/utils';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
-import { TAGS } from 'common/config/constants';
 
 export async function populateLeaderboard(
   teamList: Team[],
   memberList: Member[],
 ): Promise<void> {
+  const logger = new Logger(populateLeaderboard.name);
   const usernames = getUsernames(memberList);
 
   const members = {};
@@ -32,52 +34,87 @@ export async function populateLeaderboard(
   });
 
   const answersUrl = getAnswersUrl(usernames);
-  const result = await axios.get(answersUrl);
 
-  result.data.items.forEach(
-    async (answer): Promise<void> => {
-      const member = members[answer.owner.user_id];
-      console.log(member);
-      const isValidMember = validateMemberName(
-        member.name,
-        answer.owner.display_name,
+  const answers = await axios
+    .get(answersUrl)
+    .then(result => result.data.items)
+    .catch(err => {
+      logger.error('get answer', err);
+      throw new Error(err);
+    });
+  let answerCounter = 0;
+
+  return new Promise(
+    async (resolve): Promise<void> => {
+      answers.forEach(
+        async (answer): Promise<void> => {
+          const member = members[answer.owner.user_id];
+          const isValidMember = validateMemberName(
+            member.name,
+            answer.owner.display_name,
+          );
+          const isValidAnswerCreationDate =
+            answer.creation_date &&
+            validateAnswerCreationDate(answer.creation_date);
+          const isValidAnswerLastEditDate = !answer.last_edit_date
+            ? true
+            : validateEditedAnswer(answer.last_edit_date);
+
+          if (
+            isValidMember &&
+            isValidAnswerCreationDate &&
+            isValidAnswerLastEditDate
+          ) {
+            const questions = await axios
+              .get(getQuestionUrl(answer.question_id))
+              .then(response => response.data.items)
+              .catch(err => {
+                logger.error('get question', err);
+                return false;
+              });
+            const question = questions[0];
+            if (!question) {
+              // TODO refactor
+              answerCounter += 1;
+              if (answerCounter === answers.length) {
+                resolve();
+              }
+              return;
+            }
+
+            const questionOwnerId = question.owner.user_id;
+            const containsValidTag = question.tags.some(tag =>
+              TAGS.includes(tag),
+            );
+            const isMemberQuestionOwner = validateQuestionOwner(
+              member.username,
+              questionOwnerId,
+            );
+            const isValidQuestionCreationDate =
+              question.creation_date &&
+              validateQuestionCreationDate(question.creation_date);
+
+            if (
+              containsValidTag &&
+              !isMemberQuestionOwner &&
+              isValidQuestionCreationDate
+            ) {
+              member.score += answer.score;
+              member.link = answer.owner.link;
+              logger.debug(question.title, member);
+              teams[member.team_id].score += answer.score;
+              answerCounter += 1;
+              if (answerCounter === answers.length) {
+                resolve();
+              }
+            }
+          }
+          answerCounter += 1;
+          if (answerCounter === answers.length) {
+            resolve();
+          }
+        },
       );
-      const isValidAnswerCreationDate =
-        answer.creation_date &&
-        validateAnswerCreationDate(answer.creation_date);
-      const isValidAnswerLastEditDate = !answer.last_edit_date
-        ? true
-        : validateEditedAnswer(answer.last_edit_date);
-
-      if (
-        isValidMember &&
-        isValidAnswerCreationDate &&
-        isValidAnswerLastEditDate
-      ) {
-        const response = await axios.get(getQuestionUrl(answer.question_id));
-        const question = response.data.items[0];
-
-        const questionOwnerId = question.owner.user_id;
-        const containsValidTag = question.tags.some(tag => TAGS.includes(tag));
-        const isMemberQuestionOwner = validateQuestionOwner(
-          member.username,
-          questionOwnerId,
-        );
-        const isValidQuestionCreationDate =
-          question.creation_date &&
-          validateQuestionCreationDate(question.creation_date);
-
-        if (
-          containsValidTag &&
-          !isMemberQuestionOwner &&
-          isValidQuestionCreationDate
-        ) {
-          member.score += answer.score;
-          member.link = answer.owner.link;
-          console.log(question.title, member);
-          teams[member.team_id].score += answer.score;
-        }
-      }
     },
   );
 }

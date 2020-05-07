@@ -4,7 +4,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import config from 'common/config';
 import databaseConfig from 'common/config/database';
-import { EventsModule } from 'modules/events/events.module';
 import { TasksModule } from 'modules/tasks/tasks.module';
 import { TeamModule } from 'modules/team/team.module';
 import { AppController } from './app.controller';
@@ -27,7 +26,6 @@ const typeOrmConfig = {
       load: [config],
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
-    EventsModule,
     ScheduleModule.forRoot(),
     TasksModule,
     TeamModule,

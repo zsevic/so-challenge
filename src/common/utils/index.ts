@@ -19,14 +19,18 @@ import {
   QUESTION_END_DAY,
   QUESTION_END_HOURS,
   QUESTION_END_MINUTES,
+  ANSWERS_FROM_DATE,
+  ANSWERS_TO_DATE,
+  QUESTIONS_FROM_DATE,
+  QUESTIONS_TO_DATE,
 } from 'common/config/constants';
 import { Member } from 'modules/member/member.payload';
 
 export const getAnswersUrl = (usernames: string): string =>
-  `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow`;
+  `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}`;
 
 export const getQuestionUrl = (questionId: number): string =>
-  `https://api.stackexchange.com/2.2/questions/${questionId}?site=stackoverflow`;
+  `https://api.stackexchange.com/2.2/questions/${questionId}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}`;
 
 export const getUsernames = (memberList: Member[]): string =>
   memberList.map((member: Member): number => member.username).join(';');

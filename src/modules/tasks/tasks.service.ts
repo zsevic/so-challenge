@@ -2,7 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { populateLeaderboard } from 'common/services/stackoverflow.service';
+import {
+  getAnswerList,
+  getAnsweredQuestions,
+  validateAnsweredQuestions,
+} from 'common/services/stackoverflow.service';
+import { initialize } from 'common/utils';
 import { MemberEntity } from 'modules/member/member.entity';
 import { Member } from 'modules/member/member.payload';
 import { TeamEntity } from 'modules/team/team.entity';
@@ -29,8 +34,12 @@ export class TasksService {
       .map((team: Team): Member[] => team.members)
       .reduce((acc, current) => acc.concat(current), []);
 
+    const { members, teams } = initialize(memberList, teamList);
+
     try {
-      await populateLeaderboard(teamList, memberList);
+      const answerList = await getAnswerList(memberList);
+      const questionList = getAnsweredQuestions(members, answerList);
+      await validateAnsweredQuestions(questionList, members, teams);
 
       await this.connection.transaction(
         async (manager: EntityManager): Promise<void> => {

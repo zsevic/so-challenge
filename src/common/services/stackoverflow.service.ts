@@ -14,28 +14,12 @@ import {
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
 
-export async function populateLeaderboard(
-  teamList: Team[],
-  memberList: Member[],
-): Promise<void> {
-  const logger = new Logger(populateLeaderboard.name);
+export async function getAnswerList(memberList: Member[]): Promise<any> {
+  const logger = new Logger(getAnswerList.name);
   const usernames = getUsernames(memberList);
-
-  const members = {};
-  memberList.forEach((member: Member): void => {
-    members[member.username] = member;
-    members[member.username].score = 0;
-    members[member.username].username = +member.username;
-  });
-  const teams = {};
-  teamList.forEach((team: Team): void => {
-    teams[team.id] = team;
-    teams[team.id].score = 0;
-  });
-
   const answersUrl = getAnswersUrl(usernames);
 
-  const answers = await axios
+  return axios
     .get(answersUrl)
     .then(result => {
       logger.debug(
@@ -47,86 +31,90 @@ export async function populateLeaderboard(
       logger.error('get answer', err);
       throw new Error(err);
     });
-  let answerCounter = 0;
+}
 
-  return new Promise(
-    async (resolve): Promise<void> => {
-      answers.forEach(
-        async (answer): Promise<void> => {
-          const member = members[answer.owner.user_id];
-          const isValidMember = validateMemberName(
-            member.name,
-            answer.owner.display_name,
-          );
-          const isValidAnswerCreationDate =
-            answer.creation_date &&
-            validateAnswerCreationDate(answer.creation_date);
-          const isValidAnswerLastEditDate = !answer.last_edit_date
-            ? true
-            : validateEditedAnswer(answer.last_edit_date);
+export function getAnsweredQuestions(
+  members: Record<string, Member>,
+  answers: any,
+): Record<string, any> {
+  const answeredQuestions = {};
 
-          if (
-            isValidMember &&
-            isValidAnswerCreationDate &&
-            isValidAnswerLastEditDate
-          ) {
-            const questions = await axios
-              .get(getQuestionUrl(answer.question_id))
-              .then(response => {
-                logger.debug(
-                  `get question, remaining requests: ${response.data.quota_remaining}`,
-                );
-                return response.data.items;
-              })
-              .catch(err => {
-                logger.error('get question', err);
-                return false;
-              });
-            const question = questions[0];
-            if (!question) {
-              // TODO refactor
-              answerCounter += 1;
-              if (answerCounter === answers.length) {
-                return resolve();
-              }
-              return;
-            }
+  answers.forEach(answer => {
+    const member = members[answer.owner.user_id];
+    const isValidMember = validateMemberName(
+      member.name,
+      answer.owner.display_name,
+    );
+    const isValidAnswerCreationDate =
+      answer.creation_date && validateAnswerCreationDate(answer.creation_date);
+    const isValidAnswerLastEditDate = !answer.last_edit_date
+      ? true
+      : validateEditedAnswer(answer.last_edit_date);
 
-            const questionOwnerId = question.owner.user_id;
-            const containsValidTag = question.tags.some(tag =>
-              TAGS.includes(tag),
-            );
-            const isMemberQuestionOwner = validateQuestionOwner(
-              member.username,
-              questionOwnerId,
-            );
-            const isValidQuestionCreationDate =
-              question.creation_date &&
-              validateQuestionCreationDate(question.creation_date);
+    if (
+      isValidMember &&
+      isValidAnswerCreationDate &&
+      isValidAnswerLastEditDate
+    ) {
+      const questionId = +answer.question_id;
+      if (!answeredQuestions[answer.question_id]) {
+        answeredQuestions[questionId] = {
+          [answer.owner.user_id]: answer,
+        };
+      } else {
+        answeredQuestions[questionId][answer.owner.user_id] = answer;
+      }
+    }
+  });
+  return answeredQuestions;
+}
 
-            if (
-              containsValidTag &&
-              !isMemberQuestionOwner &&
-              isValidQuestionCreationDate
-            ) {
-              member.score += answer.score;
-              member.link = answer.owner.link;
-              logger.debug(`${question.title}, score: ${answer.score}`);
-              teams[member.team_id].score += answer.score;
-            }
-            answerCounter += 1;
-            if (answerCounter === answers.length) {
-              return resolve();
-            }
-            return;
-          } else {
-            answerCounter += 1;
-            if (answerCounter === answers.length) {
-              return resolve();
-            }
-          }
-        },
+export async function validateAnsweredQuestions(
+  answeredQuestions: Record<string, any>,
+  members: Record<number, Member>,
+  teams: Record<number, Team>,
+): Promise<void> {
+  const logger = new Logger(validateAnsweredQuestions.name);
+  const questionIds = Object.keys(answeredQuestions).join(';');
+  const questions = await axios
+    .get(getQuestionUrl(questionIds))
+    .then(response => {
+      logger.debug(
+        `get questions, remaining requests: ${response.data.quota_remaining}`,
       );
-    },
-  );
+      return response.data.items;
+    })
+    .catch(err => {
+      logger.error('get question', err);
+      throw new Error(err);
+    });
+
+  questions.forEach(question => {
+    const questionOwnerId = question.owner.user_id;
+    const containsValidTag = question.tags.some(tag => TAGS.includes(tag));
+    const isMemberQuestionOwner = validateQuestionOwner(
+      answeredQuestions,
+      questionOwnerId,
+    );
+    const isValidQuestionCreationDate =
+      question.creation_date &&
+      validateQuestionCreationDate(question.creation_date);
+    if (
+      containsValidTag &&
+      !isMemberQuestionOwner &&
+      isValidQuestionCreationDate
+    ) {
+      const answeredQuestion = answeredQuestions[question.question_id];
+      const memberIds = Object.keys(answeredQuestion);
+      memberIds.forEach(memberId => {
+        const member = members[memberId];
+        const answer = answeredQuestion[memberId];
+
+        member.score += answer.score;
+        member.link = answer.owner.link;
+        teams[member.team_id].score += answer.score;
+        logger.debug(`${question.title}, score: ${answer.score}`);
+      });
+    }
+  });
 }

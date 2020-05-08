@@ -37,7 +37,12 @@ export async function populateLeaderboard(
 
   const answers = await axios
     .get(answersUrl)
-    .then(result => result.data.items)
+    .then(result => {
+      logger.debug(
+        `get answers, remaining requests: ${result.data.quota_remaining}`,
+      );
+      return result.data.items;
+    })
     .catch(err => {
       logger.error('get answer', err);
       throw new Error(err);
@@ -67,7 +72,12 @@ export async function populateLeaderboard(
           ) {
             const questions = await axios
               .get(getQuestionUrl(answer.question_id))
-              .then(response => response.data.items)
+              .then(response => {
+                logger.debug(
+                  `get question, remaining requests: ${response.data.quota_remaining}`,
+                );
+                return response.data.items;
+              })
               .catch(err => {
                 logger.error('get question', err);
                 return false;
@@ -77,7 +87,7 @@ export async function populateLeaderboard(
               // TODO refactor
               answerCounter += 1;
               if (answerCounter === answers.length) {
-                resolve();
+                return resolve();
               }
               return;
             }
@@ -101,17 +111,19 @@ export async function populateLeaderboard(
             ) {
               member.score += answer.score;
               member.link = answer.owner.link;
-              logger.debug(question.title, member);
+              logger.debug(`${question.title}, score: ${answer.score}`);
               teams[member.team_id].score += answer.score;
-              answerCounter += 1;
-              if (answerCounter === answers.length) {
-                resolve();
-              }
             }
-          }
-          answerCounter += 1;
-          if (answerCounter === answers.length) {
-            resolve();
+            answerCounter += 1;
+            if (answerCounter === answers.length) {
+              return resolve();
+            }
+            return;
+          } else {
+            answerCounter += 1;
+            if (answerCounter === answers.length) {
+              return resolve();
+            }
           }
         },
       );

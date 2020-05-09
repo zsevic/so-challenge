@@ -2,6 +2,7 @@ import { join } from 'path';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from 'modules/app/app.module';
 import { setupApiDocs } from 'common/config/api-docs';
@@ -22,6 +23,7 @@ async function bootstrap(): Promise<void> {
   app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');
+  app.use(compression());
   app.use(cookieParser());
   app.use(loggerMiddleware);
   app.useGlobalFilters(new AllExceptionsFilter());

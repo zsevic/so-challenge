@@ -44,6 +44,7 @@
     "axios": "^0.19.2",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.1",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "hbs": "^4.1.1",
     "morgan": "^1.9.1",

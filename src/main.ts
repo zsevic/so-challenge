@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
+import * as helmet from 'helmet';
 import { AppModule } from 'modules/app/app.module';
 import { setupApiDocs } from 'common/config/api-docs';
 import { setupTemplateEngine } from 'common/config/template-engine';
@@ -21,6 +22,7 @@ async function bootstrap(): Promise<void> {
   app.setViewEngine('hbs');
   app.use(compression());
   app.use(cookieParser());
+  app.use(helmet());
   app.use(loggerMiddleware);
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(

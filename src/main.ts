@@ -16,10 +16,6 @@ async function bootstrap(): Promise<void> {
   const logger = new Logger(bootstrap.name);
   const configService = app.get('configService');
 
-  app.enableCors({
-    credentials: true,
-    origin: configService.get('CLIENT_URL'),
-  });
   app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');

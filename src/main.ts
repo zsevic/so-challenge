@@ -2,6 +2,7 @@ import { join } from 'path';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as Sentry from '@sentry/node';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import * as rateLimit from 'express-rate-limit';
@@ -43,6 +44,7 @@ async function bootstrap(): Promise<void> {
   );
   app.useStaticAssets(join(__dirname, '../..', 'public'));
   setupApiDocs(app);
+  Sentry.init({ dsn: configService.get('SENTRY_DSN') });
 
   await app.listen(configService.get('PORT')).then(() => {
     logger.log(`Server is running on port ${configService.get('PORT')}`);

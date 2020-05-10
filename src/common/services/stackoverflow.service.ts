@@ -1,16 +1,14 @@
 import { Logger } from '@nestjs/common';
 import axios from 'axios';
 import { TAGS } from 'common/config/constants';
+import { getAnswersUrl, getQuestionUrl, getUsernames } from 'common/utils';
 import {
-  getAnswersUrl,
-  getQuestionUrl,
-  getUsernames,
   validateAnswerCreationDate,
   validateMemberName,
   validateQuestionOwner,
   validateQuestionCreationDate,
   validateEditedAnswer,
-} from 'common/utils';
+} from 'common/utils/validations';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
 

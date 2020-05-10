@@ -7,6 +7,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
 import { isRegistrationEnded } from 'common/utils';
 import { CreateTeamDto } from './dto';
@@ -36,12 +37,14 @@ export class TeamController {
           ? current
           : acc,
     );
-    const lastUpdate = new Date(lastUpdatedTeam.updated_at).toLocaleString();
+    const lastUpdate = formatDistanceToNow(
+      new Date(lastUpdatedTeam.updated_at),
+    );
 
     return res.render('leaderboard', {
       ...data,
       teams,
-      updated_at: lastUpdate,
+      lastUpdate,
     });
   }
 

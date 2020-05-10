@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
   const logger = new Logger(bootstrap.name);
   const configService = app.get('configService');
 
-  app.set('trust proxy', 1); // used for rate limiter
+  app.enable('trust proxy'); // used for rate limiter
   app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');

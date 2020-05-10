@@ -26,12 +26,12 @@ export class CreateTeam1588624260549 implements MigrationInterface {
           },
           {
             name: 'created_at',
-            type: 'Date',
+            type: 'timestamp',
             default: 'current_timestamp',
           },
           {
             name: 'updated_at',
-            type: 'Date',
+            type: 'timestamp',
             default: 'current_timestamp',
           },
         ],

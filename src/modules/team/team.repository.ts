@@ -27,12 +27,11 @@ export class TeamRepository extends Repository<TeamEntity> {
   }
 
   async getTeamList(): Promise<Team[]> {
-    const teamList = await this.find({
-      relations: ['members'],
-      order: {
-        score: 'DESC',
-      },
-    });
+    const teamList = await this.createQueryBuilder('team')
+      .leftJoinAndSelect('team.members', 'member')
+      .orderBy('team.score', 'DESC')
+      .orderBy('member.score', 'DESC')
+      .getMany();
 
     return plainToClass(Team, teamList);
   }

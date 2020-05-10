@@ -39,6 +39,9 @@ export class TeamController {
     );
     const lastUpdate = formatDistanceToNow(
       new Date(lastUpdatedTeam.updated_at),
+      {
+        addSuffix: true,
+      },
     );
 
     return res.render('leaderboard', {

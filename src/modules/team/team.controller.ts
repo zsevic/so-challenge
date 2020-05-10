@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   Post,
-  Render,
   Res,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';

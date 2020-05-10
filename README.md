@@ -1,6 +1,6 @@
 # so-challenge
 
-> Minimal NestJS boilerplate
+> Stackoverflow challenge registration and leaderboard
 
 ## Getting started
 
@@ -38,8 +38,10 @@ npm test
 
 ```bash
 npm run migration:generate <MIGRATION_NAME>
-npm run migrate
-npm run migrate:down
+npm run migrate:dev
+npm run migrate:dev:down
+npm run migrate:prod
+npm run migrate:prod:down
 ```
 
 ### Seeders

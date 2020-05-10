@@ -20,27 +20,30 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Get('leaderboard')
-  @Render('leaderboard')
-  async leaderboard() {
-    const teams = await this.teamService.getLeaderboard();
-    let lastUpdate = '';
-    if (teams.length > 0) {
-      const lastUpdatedTeam = teams.reduce(
-        (acc: Team, current: Team): Team =>
-          new Date(acc.updated_at).getTime() <
-          new Date(current.updated_at).getTime()
-            ? current
-            : acc,
-      );
-      lastUpdate = new Date(lastUpdatedTeam.updated_at).toLocaleString();
-    }
-
-    return {
-      teams,
+  async leaderboard(@Res() res: Response) {
+    const data = {
       title: 'SO challenge - Leaderboard',
       page: 'leaderboard',
-      updated_at: lastUpdate,
     };
+    const teams = await this.teamService.getLeaderboard();
+    if (teams.length === 0) {
+      return res.render('leaderboard-no-teams', data);
+    }
+
+    const lastUpdatedTeam = teams.reduce(
+      (acc: Team, current: Team): Team =>
+        new Date(acc.updated_at).getTime() <
+        new Date(current.updated_at).getTime()
+          ? current
+          : acc,
+    );
+    const lastUpdate = new Date(lastUpdatedTeam.updated_at).toLocaleString();
+
+    return res.render('leaderboard', {
+      ...data,
+      teams,
+      updated_at: lastUpdate,
+    });
   }
 
   @Get('teams')

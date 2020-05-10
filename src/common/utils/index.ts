@@ -23,6 +23,11 @@ import {
   ANSWERS_TO_DATE,
   QUESTIONS_FROM_DATE,
   QUESTIONS_TO_DATE,
+  LEADERBOARD_END_YEAR,
+  LEADERBOARD_END_MONTH,
+  LEADERBOARD_END_DAY,
+  LEADERBOARD_END_HOURS,
+  LEADERBOARD_END_MINUTES,
 } from 'common/config/constants';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
@@ -100,6 +105,15 @@ export const validateQuestionOwner = (
   answeredQuestions: Record<string, any>,
   questionOwnerId: string,
 ): boolean => !!answeredQuestions[questionOwnerId];
+
+export const isCronJobFinished = () =>
+  new Date(
+    LEADERBOARD_END_YEAR,
+    LEADERBOARD_END_MONTH,
+    LEADERBOARD_END_DAY,
+    LEADERBOARD_END_HOURS,
+    LEADERBOARD_END_MINUTES,
+  ).getTime() <= new Date().getTime();
 
 type Init = {
   members: Record<number, Member>;

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Interval } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
 import {
@@ -7,15 +7,13 @@ import {
   getAnsweredQuestions,
   validateAnsweredQuestions,
 } from 'common/services/stackoverflow.service';
-import { initialize } from 'common/utils';
+import { initialize, isCronJobFinished } from 'common/utils';
 import { MemberEntity } from 'modules/member/member.entity';
 import { Member } from 'modules/member/member.payload';
 import { TeamEntity } from 'modules/team/team.entity';
 import { Team } from 'modules/team/team.payload';
 import { TeamRepository } from 'modules/team/team.repository';
-import { INTERVAL } from './tasks.constants';
-
-const INTERVAL_VALUE = INTERVAL * 60 * 1000;
+import { CRON_JOB_NAME, INTERVAL } from './tasks.constants';
 
 @Injectable()
 export class TasksService {
@@ -24,10 +22,21 @@ export class TasksService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly teamRepository: TeamRepository,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  @Interval(INTERVAL_VALUE)
+  @Cron(CronExpression.EVERY_2ND_HOUR, {
+    name: CRON_JOB_NAME,
+  })
   async handleCron() {
+    if (isCronJobFinished()) {
+      const job = this.schedulerRegistry.getCronJob(CRON_JOB_NAME);
+      job.stop();
+
+      this.logger.log(`Cron job "${CRON_JOB_NAME}" is stopped`);
+      return;
+    }
+
     this.logger.debug(`Called every ${INTERVAL} minute(s)`);
     const teamList = await this.teamRepository.getTeamList();
     const memberList = teamList

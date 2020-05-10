@@ -28,4 +28,10 @@ export const QUESTION_END_MINUTES = 0;
 export const QUESTIONS_FROM_DATE = '2016-01-10';
 export const QUESTIONS_TO_DATE = '2020-05-11';
 
+export const LEADERBOARD_END_YEAR = 2021;
+export const LEADERBOARD_END_MONTH = 3; // +1
+export const LEADERBOARD_END_DAY = 24;
+export const LEADERBOARD_END_HOURS = 16;
+export const LEADERBOARD_END_MINUTES = 0;
+
 export const TAGS = ['node.js'];

@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Post, Render } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Render,
+  Res,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { isRegistrationEnded } from 'common/utils';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
@@ -39,16 +49,22 @@ export class TeamController {
   }
 
   @Get('registration')
-  @Render('registration')
-  async registration() {
-    return {
+  async registration(@Res() res: Response) {
+    const data = {
       title: 'SO challenge - Registration',
       page: 'registration',
     };
+    if (isRegistrationEnded()) {
+      return res.render('registration-ended', data);
+    }
+    return res.render('registration', data);
   }
 
   @Post('teams')
   async registerTeam(@Body() teamDto: CreateTeamDto): Promise<Team> {
+    if (isRegistrationEnded()) {
+      throw new BadRequestException('Registration is ended');
+    }
     return this.teamService.createTeam(teamDto);
   }
 }

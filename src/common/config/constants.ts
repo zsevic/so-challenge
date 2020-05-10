@@ -34,4 +34,10 @@ export const LEADERBOARD_END_DAY = 24;
 export const LEADERBOARD_END_HOURS = 16;
 export const LEADERBOARD_END_MINUTES = 0;
 
+export const REGISTRATION_END_YEAR = 2020;
+export const REGISTRATION_END_MONTH = 8; // +1
+export const REGISTRATION_END_DAY = 24;
+export const REGISTRATION_END_HOURS = 16;
+export const REGISTRATION_END_MINUTES = 0;
+
 export const TAGS = ['node.js'];

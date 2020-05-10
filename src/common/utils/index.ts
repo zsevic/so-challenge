@@ -8,6 +8,11 @@ import {
   LEADERBOARD_END_DAY,
   LEADERBOARD_END_HOURS,
   LEADERBOARD_END_MINUTES,
+  REGISTRATION_END_YEAR,
+  REGISTRATION_END_MONTH,
+  REGISTRATION_END_DAY,
+  REGISTRATION_END_HOURS,
+  REGISTRATION_END_MINUTES,
 } from 'common/config/constants';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
@@ -21,13 +26,22 @@ export const getQuestionUrl = (questionIds: string): string =>
 export const getUsernames = (memberList: Member[]): string =>
   memberList.map((member: Member): number => member.username).join(';');
 
-export const isCronJobFinished = () =>
+export const isCronJobFinished = (): boolean =>
   new Date(
     LEADERBOARD_END_YEAR,
     LEADERBOARD_END_MONTH,
     LEADERBOARD_END_DAY,
     LEADERBOARD_END_HOURS,
     LEADERBOARD_END_MINUTES,
+  ).getTime() <= new Date().getTime();
+
+export const isRegistrationEnded = (): boolean =>
+  new Date(
+    REGISTRATION_END_YEAR,
+    REGISTRATION_END_MONTH,
+    REGISTRATION_END_DAY,
+    REGISTRATION_END_HOURS,
+    REGISTRATION_END_MINUTES,
   ).getTime() <= new Date().getTime();
 
 type Init = {

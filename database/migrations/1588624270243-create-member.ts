@@ -35,6 +35,7 @@ export class CreateMember1588624270243 implements MigrationInterface {
           {
             name: 'username',
             type: 'int',
+            isUnique: true,
           },
           {
             name: 'created_at',

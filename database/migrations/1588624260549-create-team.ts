@@ -17,6 +17,7 @@ export class CreateTeam1588624260549 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
+            isUnique: true,
           },
           {
             name: 'score',

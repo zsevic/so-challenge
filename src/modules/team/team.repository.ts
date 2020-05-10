@@ -9,7 +9,12 @@ export class TeamRepository extends Repository<TeamEntity> {
   private readonly logger = new Logger(TeamRepository.name);
 
   async createTeam(name: string, manager: EntityManager): Promise<Team> {
-    const team = await manager
+    const team = await manager.findOne(TeamEntity, { name });
+    if (team) {
+      throw new BadRequestException(`Team with name "${name}" is registered`);
+    }
+
+    const createdTeam = await manager
       .save(TeamEntity, { name })
       .catch((err: Error): void => {
         this.logger.error(err.message);
@@ -18,7 +23,7 @@ export class TeamRepository extends Repository<TeamEntity> {
         );
       });
 
-    return plainToClass(Team, team);
+    return plainToClass(Team, createdTeam);
   }
 
   async getTeamList(): Promise<Team[]> {

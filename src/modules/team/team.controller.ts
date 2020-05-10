@@ -30,19 +30,14 @@ export class TeamController {
       return res.render('leaderboard-no-teams', data);
     }
 
-    const lastUpdatedTeam = teams.reduce(
-      (acc: Team, current: Team): Team =>
-        new Date(acc.updated_at).getTime() <
-        new Date(current.updated_at).getTime()
-          ? current
-          : acc,
-    );
-    const lastUpdate = formatDistanceToNow(
-      new Date(lastUpdatedTeam.updated_at),
-      {
-        addSuffix: true,
-      },
-    );
+    const lastUpdateDate = teams
+      .map((team: Team): string => team.updated_at)
+      .reduce((acc: string, current: string): string =>
+        new Date(acc).getTime() < new Date(current).getTime() ? current : acc,
+      );
+    const lastUpdate = formatDistanceToNow(new Date(lastUpdateDate), {
+      addSuffix: true,
+    });
 
     return res.render('leaderboard', {
       ...data,

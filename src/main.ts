@@ -15,6 +15,8 @@ import { AllExceptionsFilter } from 'common/filters';
 import { loggerMiddleware } from 'common/middlewares';
 import { CustomValidationPipe } from 'common/pipes';
 
+const isProdEnv = process.env.NODE_ENV === 'production';
+
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger(bootstrap.name);
@@ -44,7 +46,9 @@ async function bootstrap(): Promise<void> {
   );
   app.useStaticAssets(join(__dirname, '../..', 'public'));
   setupApiDocs(app);
-  Sentry.init({ dsn: configService.get('SENTRY_DSN') });
+  if (isProdEnv) {
+    Sentry.init({ dsn: configService.get('SENTRY_DSN') });
+  }
 
   await app.listen(configService.get('PORT')).then(() => {
     logger.log(`Server is running on port ${configService.get('PORT')}`);

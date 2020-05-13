@@ -62,6 +62,7 @@ export class AppModule implements OnApplicationShutdown {
   }
 
   async onApplicationShutdown(signal: string): Promise<void> {
+    if (!signal) return;
     this.logger.error(`detected signal: ${signal}`);
 
     this.stopCronJob(CRON_JOB_NAME);

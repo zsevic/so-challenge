@@ -1,7 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigService, ConfigModule } from '@nestjs/config';
+import {
+  Injectable,
+  Logger,
+  Module,
+  OnApplicationShutdown,
+} from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { InjectConnection, TypeOrmModule } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
 import config from 'common/config';
 import databaseConfig from 'common/config/database';
 import { TasksModule } from 'modules/tasks/tasks.module';
@@ -38,4 +44,15 @@ const typeOrmConfig = {
     },
   ],
 })
-export class AppModule {}
+@Injectable()
+export class AppModule implements OnApplicationShutdown {
+  private readonly logger = new Logger(AppModule.name);
+  constructor(@InjectConnection() private readonly connection: Connection) {}
+
+  async onApplicationShutdown(signal: string): Promise<void> {
+    this.logger.error(`detected signal: ${signal}`);
+    await this.connection
+      .close()
+      .then(() => this.logger.log('database connection is closed'));
+  }
+}

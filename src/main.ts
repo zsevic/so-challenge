@@ -23,6 +23,7 @@ async function bootstrap(): Promise<void> {
   const configService = app.get('configService');
 
   app.enable('trust proxy'); // used for rate limiter
+  app.enableShutdownHooks();
   app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');

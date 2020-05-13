@@ -29,6 +29,8 @@ export class TasksService {
     name: CRON_JOB_NAME,
   })
   async handleCron() {
+    if (process.env.NODE_APP_INSTANCE !== '0') return;
+
     if (isCronJobFinished()) {
       const job = this.schedulerRegistry.getCronJob(CRON_JOB_NAME);
       job.stop();

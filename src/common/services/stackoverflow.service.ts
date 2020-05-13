@@ -89,9 +89,10 @@ export async function validateAnsweredQuestions(
 
   questions.forEach(question => {
     const questionOwnerId = question.owner.user_id;
+    const answeredQuestion = answeredQuestions[question.question_id];
     const containsValidTag = question.tags.some(tag => TAGS.includes(tag));
     const isMemberQuestionOwner = validateQuestionOwner(
-      answeredQuestions,
+      answeredQuestion,
       questionOwnerId,
     );
     const isValidQuestionCreationDate =
@@ -102,7 +103,6 @@ export async function validateAnsweredQuestions(
       !isMemberQuestionOwner &&
       isValidQuestionCreationDate
     ) {
-      const answeredQuestion = answeredQuestions[question.question_id];
       const memberIds = Object.keys(answeredQuestion);
       memberIds.forEach(memberId => {
         const member = members[memberId];

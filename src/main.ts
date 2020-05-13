@@ -7,13 +7,13 @@ import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
-import { AppModule } from 'modules/app/app.module';
 import { setupApiDocs } from 'common/config/api-docs';
 import { RATE_LIMIT_REQUESTS, RATE_LIMIT_TIME } from 'common/config/rate-limit';
 import { setupTemplateEngine } from 'common/config/template-engine';
 import { AllExceptionsFilter } from 'common/filters';
 import { loggerMiddleware } from 'common/middlewares';
 import { CustomValidationPipe } from 'common/pipes';
+import { AppModule } from 'modules/app/app.module';
 
 const isProdEnv = process.env.NODE_ENV === 'production';
 
@@ -24,6 +24,7 @@ async function bootstrap(): Promise<void> {
 
   app.enable('trust proxy'); // used for rate limiter
   app.enableShutdownHooks();
+  app.get(AppModule).subscribeToShutdown(() => app.close());
   app.setBaseViewsDir(join(__dirname, '../..', 'views'));
   setupTemplateEngine(__dirname);
   app.setViewEngine('hbs');

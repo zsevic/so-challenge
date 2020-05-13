@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
@@ -16,7 +16,7 @@ import { TeamRepository } from 'modules/team/team.repository';
 import { CRON_JOB_NAME, INTERVAL } from './tasks.constants';
 
 @Injectable()
-export class TasksService implements OnApplicationShutdown {
+export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   constructor(
@@ -64,13 +64,5 @@ export class TasksService implements OnApplicationShutdown {
     } catch (err) {
       this.logger.error(err);
     }
-  }
-
-  async onApplicationShutdown(signal: string): Promise<void> {
-    this.logger.error(`detected signal: ${signal}`);
-    const job = this.schedulerRegistry.getCronJob(CRON_JOB_NAME);
-    job.stop();
-
-    this.logger.log(`Cron job "${CRON_JOB_NAME}" is stopped`);
   }
 }

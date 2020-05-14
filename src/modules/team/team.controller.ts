@@ -16,7 +16,7 @@ import {
   REGISTRATION_END_HOURS,
   REGISTRATION_END_MINUTES,
 } from 'common/config/constants';
-import { isRegistrationEnded } from 'common/utils';
+import { getLeaderboardEnd, isRegistrationEnded } from 'common/utils';
 import { Member } from 'modules/member/member.payload';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
@@ -62,11 +62,13 @@ export class TeamController {
               ),
             }),
           );
+    const leaderboardEnd = getLeaderboardEnd();
 
     return res.render('leaderboard', {
       ...data,
       teamList,
       lastUpdate,
+      leaderboardEnd,
     });
   }
 

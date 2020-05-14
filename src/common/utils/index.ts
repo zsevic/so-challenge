@@ -1,13 +1,14 @@
+import { formatDistanceToNow } from 'date-fns';
 import {
   ANSWERS_FROM_DATE,
   ANSWERS_TO_DATE,
-  QUESTIONS_FROM_DATE,
-  QUESTIONS_TO_DATE,
   LEADERBOARD_END_YEAR,
   LEADERBOARD_END_MONTH,
   LEADERBOARD_END_DAY,
   LEADERBOARD_END_HOURS,
   LEADERBOARD_END_MINUTES,
+  QUESTIONS_FROM_DATE,
+  QUESTIONS_TO_DATE,
   REGISTRATION_END_YEAR,
   REGISTRATION_END_MONTH,
   REGISTRATION_END_DAY,
@@ -64,4 +65,20 @@ export const initialize = (memberList: Member[], teamList: Team[]): Init => {
     teams[id].score = 0;
   });
   return { members, teams };
+};
+
+export const getLeaderboardEnd = () => {
+  const leaderboardEndDate = new Date(
+    LEADERBOARD_END_YEAR,
+    LEADERBOARD_END_MONTH,
+    LEADERBOARD_END_DAY,
+    LEADERBOARD_END_HOURS,
+    LEADERBOARD_END_MINUTES,
+  ).getTime();
+  const leaderboardEndDistance = formatDistanceToNow(leaderboardEndDate, {
+    addSuffix: true,
+  });
+  const leaderboardEndPrefix =
+    leaderboardEndDate <= new Date().getTime() ? 'ended' : 'ends';
+  return `${leaderboardEndPrefix} ${leaderboardEndDistance}`;
 };

@@ -53,11 +53,12 @@ export class TeamController {
             (team: Team): Team => ({
               ...team,
               members: team.members.map(
-                (member: Member): Member => ({
-                  ...member,
-                  link: undefined,
-                  username: undefined,
-                }),
+                (member: Member): Member => {
+                  delete member.link;
+                  delete member.username;
+
+                  return member;
+                },
               ),
             }),
           );

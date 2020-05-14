@@ -5,8 +5,8 @@ import { getAnswersUrl, getQuestionUrl, getUsernames } from 'common/utils';
 import {
   validateAnswerCreationDate,
   validateMemberName,
-  validateQuestionOwner,
   validateQuestionCreationDate,
+  validateQuestionOwner,
   validateEditedAnswer,
 } from 'common/utils/validations';
 import { Member } from 'modules/member/member.payload';
@@ -74,6 +74,9 @@ export async function validateAnsweredQuestions(
 ): Promise<void> {
   const logger = new Logger(validateAnsweredQuestions.name);
   const questionIds = Object.keys(answeredQuestions).join(';');
+  const participantIds = Object.keys(members).map(
+    (participant: string): number => +participant,
+  );
   const questions = await axios
     .get(getQuestionUrl(questionIds))
     .then(response => {
@@ -91,17 +94,17 @@ export async function validateAnsweredQuestions(
     const questionOwnerId = question.owner.user_id;
     const answeredQuestion = answeredQuestions[question.question_id];
     const containsValidTag = question.tags.some(tag => TAGS.includes(tag));
-    const isMemberQuestionOwner = validateQuestionOwner(
-      answeredQuestion,
+    const isValidQuestionOwner = validateQuestionOwner(
       questionOwnerId,
+      participantIds,
     );
     const isValidQuestionCreationDate =
       question.creation_date &&
       validateQuestionCreationDate(question.creation_date);
     if (
       containsValidTag &&
-      !isMemberQuestionOwner &&
-      isValidQuestionCreationDate
+      isValidQuestionCreationDate &&
+      isValidQuestionOwner
     ) {
       const memberIds = Object.keys(answeredQuestion);
       memberIds.forEach(memberId => {

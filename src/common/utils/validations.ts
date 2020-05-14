@@ -83,6 +83,6 @@ export const validateQuestionCreationDate = (creationDate: number): boolean => {
 };
 
 export const validateQuestionOwner = (
-  answeredQuestions: Record<string, any>,
-  questionOwnerId: string,
-): boolean => !!answeredQuestions[questionOwnerId];
+  questionOwnerId: number,
+  participantIds: number[],
+): boolean => !participantIds.includes(questionOwnerId);

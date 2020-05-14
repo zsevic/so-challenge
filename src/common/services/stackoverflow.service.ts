@@ -73,7 +73,12 @@ export async function validateAnsweredQuestions(
   teams: Record<number, Team>,
 ): Promise<void> {
   const logger = new Logger(validateAnsweredQuestions.name);
-  const questionIds = Object.keys(answeredQuestions).join(';');
+  const answeredQuestionsIds = Object.keys(answeredQuestions);
+  if (answeredQuestionsIds.length === 0) {
+    logger.log('There are no answered questions');
+    return;
+  }
+  const questionIds = answeredQuestionsIds.join(';');
   const participantIds = Object.keys(members).map(
     (participant: string): number => +participant,
   );

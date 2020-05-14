@@ -17,6 +17,7 @@ import {
   REGISTRATION_END_MINUTES,
 } from 'common/config/constants';
 import { isRegistrationEnded } from 'common/utils';
+import { Member } from 'modules/member/member.payload';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
@@ -45,10 +46,25 @@ export class TeamController {
     const lastUpdate = formatDistanceToNow(new Date(lastUpdateDate), {
       addSuffix: true,
     });
+    const teamList =
+      process.env.NODE_ENV === 'development'
+        ? teams
+        : teams.map(
+            (team: Team): Team => ({
+              ...team,
+              members: team.members.map(
+                (member: Member): Member => ({
+                  ...member,
+                  link: undefined,
+                  username: undefined,
+                }),
+              ),
+            }),
+          );
 
     return res.render('leaderboard', {
       ...data,
-      teams,
+      teamList,
       lastUpdate,
     });
   }

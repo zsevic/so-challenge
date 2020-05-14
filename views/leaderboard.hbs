@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          {{#each teams as |team|}}
+          {{#each teamList as |team|}}
           <tr>
             <th scope="row">{{inc @index}}</th>
             <td>
@@ -32,7 +32,7 @@
                         rel="noopener noreferrer">{{member.name}}
                         - {{member.username}}</a></td>
                     {{else}}
-                    <td class="text-muted">{{member.name}} - {{member.username}}</td>
+                    <td class="text-muted">{{member.name}}</td>
                     {{/if}}
                   </tr>
                   {{/each}}

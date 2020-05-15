@@ -1,7 +1,12 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { TAGS } from 'common/config/constants';
-import { getAnswersUrl, getQuestionUrl, getUsernames } from 'common/utils';
+import {
+  getAnswersUrl,
+  getQuestionsUrl,
+  getUsernames,
+  getUsersUrl,
+} from 'common/utils';
 import {
   validateAnswerCreationDate,
   validateMemberName,
@@ -26,7 +31,7 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
       return result.data.items;
     })
     .catch(err => {
-      logger.error('get answer', err);
+      logger.error(`get answers error: ${err}`);
       throw new Error(err);
     });
 }
@@ -78,12 +83,12 @@ export async function validateAnsweredQuestions(
     logger.log('There are no answered questions');
     return;
   }
-  const questionIds = answeredQuestionsIds.join(';');
+  const questionsIds = answeredQuestionsIds.join(';');
   const participantIds = Object.keys(members).map(
     (participant: string): number => +participant,
   );
   const questions = await axios
-    .get(getQuestionUrl(questionIds))
+    .get(getQuestionsUrl(questionsIds))
     .then(response => {
       logger.debug(
         `get questions, remaining requests: ${response.data.quota_remaining}`,
@@ -91,7 +96,7 @@ export async function validateAnsweredQuestions(
       return response.data.items;
     })
     .catch(err => {
-      logger.error('get question', err);
+      logger.error(`get questions error: ${err}`);
       throw new Error(err);
     });
 
@@ -123,4 +128,49 @@ export async function validateAnsweredQuestions(
       });
     }
   });
+}
+
+export function validateMembers(users: any, teamMembers: Member[]): void {
+  if (users.length !== teamMembers.length) {
+    throw new BadRequestException('Team members are not valid, length error');
+  }
+  const members = {};
+  teamMembers.forEach((member: Member): void => {
+    const memberName = member.name.trim();
+    if (members[memberName]) {
+      throw new BadRequestException(
+        `Team members are not valid, duplicate name ${member.name}`,
+      );
+    }
+    members[memberName] = member.username;
+  });
+
+  users.forEach((user: any): void => {
+    if (
+      !members[user.display_name] ||
+      members[user.display_name] !== user.user_id
+    ) {
+      throw new BadRequestException(
+        `Team member with username: ${user.user_id} is not valid`,
+      );
+    }
+  });
+}
+
+export async function validateTeam(team: Team): Promise<void> {
+  const logger = new Logger(validateTeam.name);
+  const memberIds = getUsernames(team.members);
+  const members = await axios
+    .get(getUsersUrl(memberIds))
+    .then(response => {
+      logger.debug(
+        `get users, remaining requests: ${response.data.quota_remaining}`,
+      );
+      return response.data.items;
+    })
+    .catch(err => {
+      logger.error(`get users error: ${err}`);
+      throw new Error(err);
+    });
+  validateMembers(members, team.members);
 }

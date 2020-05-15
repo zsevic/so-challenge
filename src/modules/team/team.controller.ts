@@ -109,6 +109,8 @@ export class TeamController {
     if (isRegistrationEnded()) {
       throw new BadRequestException('Registration is ended');
     }
+    await this.teamService.validateTeam(teamDto);
+
     return this.teamService.createTeam(teamDto);
   }
 }

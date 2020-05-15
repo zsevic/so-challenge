@@ -21,8 +21,11 @@ import { Team } from 'modules/team/team.payload';
 export const getAnswersUrl = (usernames: string): string =>
   `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}`;
 
-export const getQuestionUrl = (questionIds: string): string =>
-  `https://api.stackexchange.com/2.2/questions/${questionIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}`;
+export const getQuestionsUrl = (questionsIds: string): string =>
+  `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}`;
+
+export const getUsersUrl = (usernames: string): string =>
+  `https://api.stackexchange.com/2.2/users/${usernames}?site=stackoverflow`;
 
 export const getUsernames = (memberList: Member[]): string =>
   memberList.map((member: Member): number => member.username).join(';');

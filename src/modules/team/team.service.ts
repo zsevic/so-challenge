@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
+import * as stackoverflowService from 'common/services/stackoverflow.service';
 import { MemberRepository } from 'modules/member/member.repository';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
@@ -41,5 +42,9 @@ export class TeamService {
 
   async getTeamList(): Promise<Team[]> {
     return this.teamRepository.getTeamList();
+  }
+
+  async validateTeam(team: Team): Promise<void> {
+    await stackoverflowService.validateTeam(team);
   }
 }

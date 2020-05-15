@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { NameTransformer } from 'modules/member/transformers/name.transformer';
 import { TeamEntity } from 'modules/team/team.entity';
 
 @Entity('member')
@@ -22,7 +23,9 @@ export class MemberEntity {
   })
   link: string;
 
-  @Column()
+  @Column({
+    transformer: new NameTransformer(),
+  })
   name: string;
 
   @Column({

@@ -10,13 +10,11 @@ import { ApiTags } from '@nestjs/swagger';
 import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
 import {
-  REGISTRATION_END_YEAR,
-  REGISTRATION_END_MONTH,
-  REGISTRATION_END_DAY,
-  REGISTRATION_END_HOURS,
-  REGISTRATION_END_MINUTES,
-} from 'common/config/constants';
-import { getLeaderboardEnd, isRegistrationEnded } from 'common/utils';
+  getEnd,
+  isRegistrationEnded,
+  LEADERBOARD_END,
+  REGISTRATION_END,
+} from 'common/utils';
 import { Member } from 'modules/member/member.payload';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
@@ -62,7 +60,7 @@ export class TeamController {
               ),
             }),
           );
-    const leaderboardEnd = getLeaderboardEnd();
+    const leaderboardEnd = getEnd(LEADERBOARD_END);
 
     return res.render('leaderboard', {
       ...data,
@@ -86,18 +84,8 @@ export class TeamController {
     if (isRegistrationEnded()) {
       return res.render('registration-ended', data);
     }
-    const registrationEnd = formatDistanceToNow(
-      new Date(
-        REGISTRATION_END_YEAR,
-        REGISTRATION_END_MONTH,
-        REGISTRATION_END_DAY,
-        REGISTRATION_END_HOURS,
-        REGISTRATION_END_MINUTES,
-      ),
-      {
-        addSuffix: true,
-      },
-    );
+    const registrationEnd = getEnd(REGISTRATION_END);
+
     return res.render('registration', {
       ...data,
       registrationEnd,

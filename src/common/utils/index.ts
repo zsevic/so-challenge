@@ -30,23 +30,27 @@ export const getUsersUrl = (usernames: string): string =>
 export const getUsernames = (memberList: Member[]): string =>
   memberList.map((member: Member): number => member.username).join(';');
 
+export const LEADERBOARD_END = new Date(
+  LEADERBOARD_END_YEAR,
+  LEADERBOARD_END_MONTH,
+  LEADERBOARD_END_DAY,
+  LEADERBOARD_END_HOURS,
+  LEADERBOARD_END_MINUTES,
+).getTime();
+
+export const REGISTRATION_END = new Date(
+  REGISTRATION_END_YEAR,
+  REGISTRATION_END_MONTH,
+  REGISTRATION_END_DAY,
+  REGISTRATION_END_HOURS,
+  REGISTRATION_END_MINUTES,
+).getTime();
+
 export const isCronJobFinished = (): boolean =>
-  new Date(
-    LEADERBOARD_END_YEAR,
-    LEADERBOARD_END_MONTH,
-    LEADERBOARD_END_DAY,
-    LEADERBOARD_END_HOURS,
-    LEADERBOARD_END_MINUTES,
-  ).getTime() <= new Date().getTime();
+  LEADERBOARD_END <= new Date().getTime();
 
 export const isRegistrationEnded = (): boolean =>
-  new Date(
-    REGISTRATION_END_YEAR,
-    REGISTRATION_END_MONTH,
-    REGISTRATION_END_DAY,
-    REGISTRATION_END_HOURS,
-    REGISTRATION_END_MINUTES,
-  ).getTime() <= new Date().getTime();
+  REGISTRATION_END <= new Date().getTime();
 
 type Init = {
   members: Record<number, Member>;
@@ -70,18 +74,14 @@ export const initialize = (memberList: Member[], teamList: Team[]): Init => {
   return { members, teams };
 };
 
-export const getLeaderboardEnd = () => {
-  const leaderboardEndDate = new Date(
-    LEADERBOARD_END_YEAR,
-    LEADERBOARD_END_MONTH,
-    LEADERBOARD_END_DAY,
-    LEADERBOARD_END_HOURS,
-    LEADERBOARD_END_MINUTES,
-  ).getTime();
-  const leaderboardEndDistance = formatDistanceToNow(leaderboardEndDate, {
+const getPrefix = (date: number): string =>
+  date <= new Date().getTime() ? 'ended' : 'ends';
+
+export const getEnd = (endDate: number): string => {
+  const distance = formatDistanceToNow(endDate, {
     addSuffix: true,
   });
-  const leaderboardEndPrefix =
-    leaderboardEndDate <= new Date().getTime() ? 'ended' : 'ends';
-  return `${leaderboardEndPrefix} ${leaderboardEndDistance}`;
+  const prefix = getPrefix(endDate);
+
+  return `${prefix} ${distance}`;
 };

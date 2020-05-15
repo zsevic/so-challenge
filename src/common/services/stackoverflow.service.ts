@@ -32,7 +32,7 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
     })
     .catch(err => {
       logger.error(`get answers error: ${err}`);
-      throw new Error(err);
+      throw new BadRequestException(err);
     });
 }
 
@@ -97,7 +97,7 @@ export async function validateAnsweredQuestions(
     })
     .catch(err => {
       logger.error(`get questions error: ${err}`);
-      throw new Error(err);
+      throw new BadRequestException(err);
     });
 
   questions.forEach(question => {
@@ -170,7 +170,7 @@ export async function validateTeam(team: Team): Promise<void> {
     })
     .catch(err => {
       logger.error(`get users error: ${err}`);
-      throw new Error(err);
+      throw new BadRequestException(err);
     });
   validateMembers(members, team.members);
 }

@@ -42,4 +42,5 @@ export const REGISTRATION_END_MINUTES = 0;
 
 export const TAGS = ['node.js'];
 
-export const BATCH_SIZE = 100;
+export const ANSWERS_BATCH_SIZE = 100;
+export const QUESTIONS_BATCH_SIZE = 100;

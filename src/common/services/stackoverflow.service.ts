@@ -1,6 +1,10 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { BATCH_SIZE, TAGS } from 'common/config/constants';
+import {
+  ANSWERS_BATCH_SIZE,
+  QUESTIONS_BATCH_SIZE,
+  TAGS,
+} from 'common/config/constants';
 import {
   getAnswersUrl,
   getQuestionsUrl,
@@ -10,10 +14,10 @@ import {
 } from 'common/utils';
 import {
   validateAnswerCreationDate,
+  validateEditedAnswer,
   validateMemberName,
   validateQuestionCreationDate,
   validateQuestionOwner,
-  validateEditedAnswer,
 } from 'common/utils/validations';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
@@ -23,7 +27,7 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
   const memberUsernames = memberList.map(
     (member: Member): number => member.username,
   );
-  const usernamesList = splitBy(BATCH_SIZE, memberUsernames);
+  const usernamesList = splitBy(ANSWERS_BATCH_SIZE, memberUsernames);
   const answers = usernamesList
     .map((usernames: number[]): string => usernames.join(';'))
     .map((usernames: string): string => getAnswersUrl(usernames))
@@ -33,18 +37,16 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
     .then(results =>
       results.map(result => {
         logger.debug(
-          `get answers, remaining requests: ${result.data.quota_remaining}`,
+          `get answers, length: ${result.data.items.length}, has more: ${result.data.has_more}, remaining requests: ${result.data.quota_remaining}`,
         );
         return result.data.items;
       }),
     )
     .then(result => [].concat(...result))
-    .catch(
-      (err: Error): BadRequestException => {
-        logger.error(`get answers error: ${err}`);
-        throw new BadRequestException(err);
-      },
-    );
+    .catch((err: Error) => {
+      logger.error(`get answers error: ${err}`);
+      throw new BadRequestException(err);
+    });
 }
 
 export function getAnsweredQuestions(
@@ -89,29 +91,39 @@ export async function validateAnsweredQuestions(
   teams: Record<number, Team>,
 ): Promise<void> {
   const logger = new Logger(validateAnsweredQuestions.name);
-  const answeredQuestionsIds = Object.keys(answeredQuestions);
+  const answeredQuestionsIds = Object.keys(answeredQuestions).map(
+    (id: string): number => +id,
+  );
   if (answeredQuestionsIds.length === 0) {
     logger.log('There are no answered questions');
     return;
   }
-  const questionsIds = answeredQuestionsIds.join(';');
-  const participantIds = Object.keys(members).map(
-    (participant: string): number => +participant,
-  );
-  const questions = await axios
-    .get(getQuestionsUrl(questionsIds))
-    .then(response => {
-      logger.debug(
-        `get questions, remaining requests: ${response.data.quota_remaining}`,
-      );
-      return response.data.items;
-    })
-    .catch(err => {
+
+  const questionsIdsList = splitBy(QUESTIONS_BATCH_SIZE, answeredQuestionsIds);
+  const questions = questionsIdsList
+    .map((questionsIds: number[]): string => questionsIds.join(';'))
+    .map((questionsIds: string): string => getQuestionsUrl(questionsIds))
+    .map((questionsUrl: string) => axios.get(questionsUrl));
+
+  const questionList = await Promise.all(questions)
+    .then(results =>
+      results.map(result => {
+        logger.debug(
+          `get questions, length: ${result.data.items.length}, has more: ${result.data.has_more}, remaining requests: ${result.data.quota_remaining}`,
+        );
+        return result.data.items;
+      }),
+    )
+    .then(result => [].concat(...result))
+    .catch((err: Error) => {
       logger.error(`get questions error: ${err}`);
       throw new BadRequestException(err);
     });
 
-  questions.forEach(question => {
+  questionList.forEach(question => {
+    const participantIds = Object.keys(members).map(
+      (participant: string): number => +participant,
+    );
     const questionOwnerId = question.owner.user_id;
     const answeredQuestion = answeredQuestions[question.question_id];
     const containsValidTag = question.tags.some(tag => TAGS.includes(tag));

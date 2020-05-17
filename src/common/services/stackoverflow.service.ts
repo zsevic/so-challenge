@@ -1,11 +1,12 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { TAGS } from 'common/config/constants';
+import { BATCH_SIZE, TAGS } from 'common/config/constants';
 import {
   getAnswersUrl,
   getQuestionsUrl,
   getUsernames,
   getUsersUrl,
+  splitBy,
 } from 'common/utils';
 import {
   validateAnswerCreationDate,
@@ -19,21 +20,31 @@ import { Team } from 'modules/team/team.payload';
 
 export async function getAnswerList(memberList: Member[]): Promise<any> {
   const logger = new Logger(getAnswerList.name);
-  const usernames = getUsernames(memberList);
-  const answersUrl = getAnswersUrl(usernames);
+  const memberUsernames = memberList.map(
+    (member: Member): number => member.username,
+  );
+  const usernamesList = splitBy(BATCH_SIZE, memberUsernames);
+  const answers = usernamesList
+    .map((usernames: number[]): string => usernames.join(';'))
+    .map((usernames: string): string => getAnswersUrl(usernames))
+    .map((answersUrl: string) => axios.get(answersUrl));
 
-  return axios
-    .get(answersUrl)
-    .then(result => {
-      logger.debug(
-        `get answers, remaining requests: ${result.data.quota_remaining}`,
-      );
-      return result.data.items;
-    })
-    .catch(err => {
-      logger.error(`get answers error: ${err}`);
-      throw new BadRequestException(err);
-    });
+  return Promise.all(answers)
+    .then(results =>
+      results.map(result => {
+        logger.debug(
+          `get answers, remaining requests: ${result.data.quota_remaining}`,
+        );
+        return result.data.items;
+      }),
+    )
+    .then(result => [].concat(...result))
+    .catch(
+      (err: Error): BadRequestException => {
+        logger.error(`get answers error: ${err}`);
+        throw new BadRequestException(err);
+      },
+    );
 }
 
 export function getAnsweredQuestions(

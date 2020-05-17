@@ -85,3 +85,10 @@ export const getEnd = (endDate: number): string => {
 
   return `${prefix} ${distance}`;
 };
+
+export const splitBy = (size: number, array: number[]): number[][] =>
+  array.reduce(
+    (acc: number[][], _: number, index: number, self: number[]) =>
+      !(index % size) ? [...acc, self.slice(index, index + size)] : acc,
+    [],
+  );

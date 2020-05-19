@@ -2,6 +2,7 @@ import { formatDistanceToNow } from 'date-fns';
 import {
   ANSWERS_FROM_DATE,
   ANSWERS_TO_DATE,
+  ANSWERS_PAGE_SIZE,
   LEADERBOARD_END_YEAR,
   LEADERBOARD_END_MONTH,
   LEADERBOARD_END_DAY,
@@ -9,6 +10,7 @@ import {
   LEADERBOARD_END_MINUTES,
   QUESTIONS_FROM_DATE,
   QUESTIONS_TO_DATE,
+  QUESTIONS_PAGE_SIZE,
   REGISTRATION_END_YEAR,
   REGISTRATION_END_MONTH,
   REGISTRATION_END_DAY,
@@ -18,11 +20,19 @@ import {
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
 
-export const getAnswersUrl = (usernames: string): string =>
-  `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&pagesize=100`;
+export const getAnswersUrl = (
+  usernames: string,
+  pagesize = ANSWERS_PAGE_SIZE,
+  page = 1,
+): string =>
+  `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
 
-export const getQuestionsUrl = (questionsIds: string): string =>
-  `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}&pagesize=100`;
+export const getQuestionsUrl = (
+  questionsIds: string,
+  pagesize = QUESTIONS_PAGE_SIZE,
+  page = 1,
+): string =>
+  `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
 
 export const getUsersUrl = (usernames: string): string =>
   `https://api.stackexchange.com/2.2/users/${usernames}?site=stackoverflow`;

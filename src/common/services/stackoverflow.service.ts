@@ -1,5 +1,6 @@
+import { parse } from 'url';
 import { BadRequestException, Logger } from '@nestjs/common';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
   ANSWERS_BATCH_SIZE,
   QUESTIONS_BATCH_SIZE,
@@ -18,12 +19,52 @@ import {
   validateMemberName,
   validateQuestionCreationDate,
   validateQuestionOwner,
+  validateTeamMembers,
 } from 'common/utils/validations';
 import { Member } from 'modules/member/member.payload';
 import { Team } from 'modules/team/team.payload';
 
+async function getData(
+  apiCalls: Promise<AxiosResponse<any>>[],
+  data = [],
+): Promise<any> {
+  const logger = new Logger(getData.name);
+  const newApiCalls = [];
+  return Promise.all(apiCalls)
+    .then(results =>
+      results.map(result => {
+        if (result.data.has_more) {
+          const { url } = result.config;
+          const { query } = parse(url, true);
+          const page = +query.page + 1 + '';
+
+          const urlPath = url.split('?')[0];
+          const queryParameters = new URLSearchParams({
+            ...query,
+            page,
+          });
+          const apiUrl = urlPath + '?' + queryParameters.toString();
+
+          newApiCalls.push(axios.get(apiUrl));
+        }
+        logger.debug(
+          `get data, length: ${result.data.items.length}, has more: ${result.data.has_more},
+          remaining requests: ${result.data.quota_remaining}`,
+        );
+        return result.data.items;
+      }),
+    )
+    .then(result => data.concat(...result))
+    .then(result =>
+      newApiCalls.length > 0 ? getData(newApiCalls, result) : result,
+    )
+    .catch((err: Error) => {
+      logger.error(`get data error: ${err}`);
+      throw new BadRequestException(err);
+    });
+}
+
 export async function getAnswerList(memberList: Member[]): Promise<any> {
-  const logger = new Logger(getAnswerList.name);
   const memberUsernames = memberList.map(
     (member: Member): number => member.username,
   );
@@ -33,20 +74,7 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
     .map((usernames: string): string => getAnswersUrl(usernames))
     .map((answersUrl: string) => axios.get(answersUrl));
 
-  return Promise.all(answers)
-    .then(results =>
-      results.map(result => {
-        logger.debug(
-          `get answers, length: ${result.data.items.length}, has more: ${result.data.has_more}, remaining requests: ${result.data.quota_remaining}`,
-        );
-        return result.data.items;
-      }),
-    )
-    .then(result => [].concat(...result))
-    .catch((err: Error) => {
-      logger.error(`get answers error: ${err}`);
-      throw new BadRequestException(err);
-    });
+  return getData(answers);
 }
 
 export function getAnsweredQuestions(
@@ -105,21 +133,7 @@ export async function validateAnsweredQuestions(
     .map((questionsIds: string): string => getQuestionsUrl(questionsIds))
     .map((questionsUrl: string) => axios.get(questionsUrl));
 
-  const questionList = await Promise.all(questions)
-    .then(results =>
-      results.map(result => {
-        logger.debug(
-          `get questions, length: ${result.data.items.length}, has more: ${result.data.has_more}, remaining requests: ${result.data.quota_remaining}`,
-        );
-        return result.data.items;
-      }),
-    )
-    .then(result => [].concat(...result))
-    .catch((err: Error) => {
-      logger.error(`get questions error: ${err}`);
-      throw new BadRequestException(err);
-    });
-
+  const questionList = await getData(questions);
   questionList.forEach(question => {
     const participantIds = Object.keys(members).map(
       (participant: string): number => +participant,
@@ -153,33 +167,6 @@ export async function validateAnsweredQuestions(
   });
 }
 
-export function validateMembers(users: any, teamMembers: Member[]): void {
-  if (users.length !== teamMembers.length) {
-    throw new BadRequestException('Team members are not valid, length error');
-  }
-  const members = {};
-  teamMembers.forEach((member: Member): void => {
-    const memberName = member.name.trim();
-    if (members[memberName]) {
-      throw new BadRequestException(
-        `Team members are not valid, duplicate name ${member.name}`,
-      );
-    }
-    members[memberName] = member.username;
-  });
-
-  users.forEach((user: any): void => {
-    if (
-      !members[user.display_name] ||
-      members[user.display_name] !== user.user_id
-    ) {
-      throw new BadRequestException(
-        `Team member with username: ${user.user_id} is not valid`,
-      );
-    }
-  });
-}
-
 export async function validateTeam(team: Team): Promise<void> {
   const logger = new Logger(validateTeam.name);
   const memberIds = getUsernames(team.members);
@@ -195,5 +182,5 @@ export async function validateTeam(team: Team): Promise<void> {
       logger.error(`get users error: ${err}`);
       throw new BadRequestException(err);
     });
-  validateMembers(members, team.members);
+  validateTeamMembers(members, team.members);
 }

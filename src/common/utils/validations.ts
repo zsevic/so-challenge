@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import {
   ANSWER_START_YEAR,
   ANSWER_START_MONTH,
@@ -20,6 +21,7 @@ import {
   QUESTION_END_HOURS,
   QUESTION_END_MINUTES,
 } from 'common/config/constants';
+import { Member } from 'modules/member/member.payload';
 
 export const validateAnswerCreationDate = (creationDate: number): boolean => {
   const answerCreationDate = new Date(creationDate * 1000).getTime();
@@ -86,3 +88,30 @@ export const validateQuestionOwner = (
   questionOwnerId: number,
   participantIds: number[],
 ): boolean => !participantIds.includes(questionOwnerId);
+
+export function validateTeamMembers(users: any, teamMembers: Member[]): void {
+  if (users.length !== teamMembers.length) {
+    throw new BadRequestException('Team members are not valid, length error');
+  }
+  const members = {};
+  teamMembers.forEach((member: Member): void => {
+    const memberName = member.name.trim();
+    if (members[memberName]) {
+      throw new BadRequestException(
+        `Team members are not valid, duplicate name ${member.name}`,
+      );
+    }
+    members[memberName] = member.username;
+  });
+
+  users.forEach((user: any): void => {
+    if (
+      !members[user.display_name] ||
+      members[user.display_name] !== user.user_id
+    ) {
+      throw new BadRequestException(
+        `Team member with username: ${user.user_id} is not valid`,
+      );
+    }
+  });
+}

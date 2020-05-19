@@ -57,7 +57,7 @@ export class TasksService {
         async (manager: EntityManager): Promise<void> => {
           await manager
             .save(TeamEntity, teamList)
-            .then(() => this.logger.debug('team saved'));
+            .then(() => this.logger.debug('teams saved'));
           await manager
             .save(MemberEntity, memberList)
             .then(() => this.logger.debug('members saved'));

@@ -44,3 +44,6 @@ export const TAGS = ['node.js'];
 
 export const ANSWERS_BATCH_SIZE = 100;
 export const QUESTIONS_BATCH_SIZE = 100;
+
+export const ANSWERS_PAGE_SIZE = 100;
+export const QUESTIONS_PAGE_SIZE = 100;

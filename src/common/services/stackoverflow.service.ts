@@ -30,38 +30,36 @@ async function getData(
 ): Promise<any> {
   const logger = new Logger(getData.name);
   const newApiCalls = [];
-  return Promise.all(apiCalls)
-    .then(results =>
-      results.map(result => {
-        if (result.data.has_more) {
-          const { url } = result.config;
-          const { query } = parse(url, true);
-          const page = +query.page + 1 + '';
+  try {
+    const responses = await Promise.all(apiCalls);
+    const result = responses.map(response => {
+      const { url } = response.config;
+      const urlPath = url.split('?')[0];
+      if (response.data.has_more) {
+        const { query } = parse(url, true);
+        const page = +query.page + 1 + '';
+        const queryParameters = new URLSearchParams({
+          ...query,
+          page,
+        });
+        const apiUrl = urlPath + '?' + queryParameters.toString();
 
-          const urlPath = url.split('?')[0];
-          const queryParameters = new URLSearchParams({
-            ...query,
-            page,
-          });
-          const apiUrl = urlPath + '?' + queryParameters.toString();
-
-          newApiCalls.push(axios.get(apiUrl));
-        }
-        logger.debug(
-          `get data, length: ${result.data.items.length}, has more: ${result.data.has_more},
-          remaining requests: ${result.data.quota_remaining}`,
-        );
-        return result.data.items;
-      }),
-    )
-    .then(result => data.concat(...result))
-    .then(result =>
-      newApiCalls.length > 0 ? getData(newApiCalls, result) : result,
-    )
-    .catch((err: Error) => {
-      logger.error(`get data error: ${err}`);
-      throw new BadRequestException(err);
+        newApiCalls.push(axios.get(apiUrl));
+      }
+      const resource = urlPath.split('/').slice(-1)[0] === 'answers' ? 'answers' : 'questions';
+      logger.debug(
+        `get ${resource}, length: ${response.data.items.length}, has more: ${response.data.has_more},
+      remaining requests: ${response.data.quota_remaining}`,
+      );
+      return response.data.items;
     });
+    const newData = data.concat(...result);
+
+    return newApiCalls.length > 0 ? getData(newApiCalls, newData) : newData;
+  } catch (err) {
+    logger.error(`get data error: ${err}`);
+    throw new BadRequestException(err);
+  }
 }
 
 export async function getAnswerList(memberList: Member[]): Promise<any> {

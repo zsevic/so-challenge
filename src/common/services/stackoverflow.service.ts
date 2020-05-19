@@ -46,7 +46,8 @@ async function getData(
 
         newApiCalls.push(axios.get(apiUrl));
       }
-      const resource = urlPath.split('/').slice(-1)[0] === 'answers' ? 'answers' : 'questions';
+      const resource =
+        urlPath.split('/').slice(-1)[0] === 'answers' ? 'answers' : 'questions';
       logger.debug(
         `get ${resource}, length: ${response.data.items.length}, has more: ${response.data.has_more},
       remaining requests: ${response.data.quota_remaining}`,

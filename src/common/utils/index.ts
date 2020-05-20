@@ -37,8 +37,21 @@ export const getQuestionsUrl = (
 export const getUsersUrl = (usernames: string): string =>
   `https://api.stackexchange.com/2.2/users/${usernames}?site=stackoverflow`;
 
-export const getParticipantStackoverflowIds = (participantList: Participant[]): string =>
-  participantList.map((participant: Participant): number => participant.stackoverflow_id).join(';');
+export const getParticipantStackoverflowIds = (
+  participantList: Participant[],
+): string =>
+  participantList
+    .map((participant: Participant): number => participant.stackoverflow_id)
+    .join(';');
+
+export const getQueryParameterDateFormat = (
+  year: number,
+  month: number,
+  day: number,
+): string => {
+  const monthValue = month < 9 ? `0${month + 1}` : month + 1;
+  return `${year}-${monthValue}-${day}`;
+};
 
 export const LEADERBOARD_END = new Date(
   LEADERBOARD_END_YEAR,
@@ -67,7 +80,10 @@ type Init = {
   teams: Record<number, Team>;
 };
 
-export const initialize = (participantList: Participant[], teamList: Team[]): Init => {
+export const initialize = (
+  participantList: Participant[],
+  teamList: Team[],
+): Init => {
   const participants = {};
   participantList.forEach((participant: Participant): void => {
     const id = +participant.stackoverflow_id;

@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { MemberEntity } from 'modules/member/member.entity';
+import { ParticipantEntity } from 'modules/participant/participant.entity';
 
 @Entity('team')
 export class TeamEntity {
@@ -25,10 +25,10 @@ export class TeamEntity {
   score: number;
 
   @OneToMany(
-    () => MemberEntity,
-    memberEntity => memberEntity.team,
+    () => ParticipantEntity,
+    participantEntity => participantEntity.team,
   )
-  members: MemberEntity[];
+  members: ParticipantEntity[];
 
   @CreateDateColumn()
   created_at: Date;

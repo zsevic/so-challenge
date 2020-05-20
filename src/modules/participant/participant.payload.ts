@@ -1,5 +1,7 @@
-export class Member {
+export class Participant {
   id?: string;
+
+  stackoverflow_id: number;
 
   team_id?: string;
 
@@ -8,6 +10,4 @@ export class Member {
   name: string;
 
   score?: number;
-
-  username: number;
 }

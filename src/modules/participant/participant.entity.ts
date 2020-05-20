@@ -7,13 +7,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { NameTransformer } from 'modules/member/transformers/name.transformer';
+import { NameTransformer } from 'modules/participant/transformers/name.transformer';
 import { TeamEntity } from 'modules/team/team.entity';
 
-@Entity('member')
-export class MemberEntity {
+@Entity('participant')
+export class ParticipantEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({
+    unique: true,
+    type: 'int',
+  })
+  stackoverflow_id: number;
 
   @Column()
   team_id: string;
@@ -33,12 +39,6 @@ export class MemberEntity {
     type: 'int',
   })
   score: number;
-
-  @Column({
-    unique: true,
-    type: 'int',
-  })
-  username: number;
 
   @ManyToOne(
     () => TeamEntity,

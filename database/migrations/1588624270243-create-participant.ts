@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateMember1588624270243 implements MigrationInterface {
+export class CreateParticipant1588624270243 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'member',
+        name: 'participant',
         columns: [
           {
             name: 'id',
@@ -13,6 +13,11 @@ export class CreateMember1588624270243 implements MigrationInterface {
             generationStrategy: 'uuid',
             isGenerated: true,
             isPrimary: true,
+          },
+          {
+            name: 'stackoverflow_id',
+            type: 'int',
+            isUnique: true,
           },
           {
             name: 'team_id',
@@ -33,11 +38,6 @@ export class CreateMember1588624270243 implements MigrationInterface {
             default: 0,
           },
           {
-            name: 'username',
-            type: 'int',
-            isUnique: true,
-          },
-          {
             name: 'created_at',
             type: 'timestamp',
             default: 'current_timestamp',
@@ -54,6 +54,6 @@ export class CreateMember1588624270243 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('member');
+    await queryRunner.dropTable('participant');
   }
 }

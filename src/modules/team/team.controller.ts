@@ -15,7 +15,7 @@ import {
   LEADERBOARD_END,
   REGISTRATION_END,
 } from 'common/utils';
-import { Member } from 'modules/member/member.payload';
+import { Participant } from 'modules/participant/participant.payload';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
@@ -51,9 +51,9 @@ export class TeamController {
             (team: Team): Team => ({
               ...team,
               members: team.members.map(
-                (member: Member): Member => {
+                (member: Participant): Participant => {
                   delete member.link;
-                  delete member.username;
+                  delete member.stackoverflow_id;
 
                   return member;
                 },

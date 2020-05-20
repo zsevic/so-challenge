@@ -5,11 +5,11 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
 } from 'class-validator';
-import { CreateMemberDto } from 'modules/member/dto';
+import { CreateParticipantDto } from 'modules/participant/dto';
 import {
   MEMBERS_MAX_LENGTH,
   MEMBERS_MIN_LENGTH,
-} from 'modules/member/member.constants';
+} from 'modules/team/team.constants';
 
 export class CreateTeamDto {
   @IsNotEmpty()
@@ -19,6 +19,6 @@ export class CreateTeamDto {
   @ValidateNested({ each: true })
   @ArrayMinSize(MEMBERS_MIN_LENGTH)
   @ArrayMaxSize(MEMBERS_MAX_LENGTH)
-  @Type(() => CreateMemberDto)
-  members: CreateMemberDto[];
+  @Type(() => CreateParticipantDto)
+  members: CreateParticipantDto[];
 }

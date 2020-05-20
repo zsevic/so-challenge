@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mockConnectionProvider } from 'common/mocks';
-import { MemberRepository } from 'modules/member/member.repository';
+import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
 
@@ -10,8 +10,8 @@ describe('TeamService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        MemberRepository,
         mockConnectionProvider,
+        ParticipantRepository,
         TeamRepository,
         TeamService,
       ],

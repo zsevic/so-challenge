@@ -8,8 +8,8 @@ import {
   validateAnsweredQuestions,
 } from 'common/services/stackoverflow.service';
 import { initialize, isCronJobFinished } from 'common/utils';
-import { MemberEntity } from 'modules/member/member.entity';
-import { Member } from 'modules/member/member.payload';
+import { ParticipantEntity } from 'modules/participant/participant.entity';
+import { Participant } from 'modules/participant/participant.payload';
 import { TeamEntity } from 'modules/team/team.entity';
 import { Team } from 'modules/team/team.payload';
 import { TeamRepository } from 'modules/team/team.repository';
@@ -42,25 +42,25 @@ export class TasksService {
 
     this.logger.debug(`Called every ${INTERVAL} minute(s)`);
     const teamList = await this.teamRepository.getTeamList();
-    const memberList = teamList
-      .map((team: Team): Member[] => team.members)
+    const participantList = teamList
+      .map((team: Team): Participant[] => team.members)
       .reduce((acc, current) => acc.concat(current), []);
 
-    const { members, teams } = initialize(memberList, teamList);
+    const { participants, teams } = initialize(participantList, teamList);
 
     try {
-      const answerList = await getAnswerList(memberList);
-      const questionList = getAnsweredQuestions(members, answerList);
-      await validateAnsweredQuestions(questionList, members, teams);
+      const answerList = await getAnswerList(participantList);
+      const questionList = getAnsweredQuestions(participants, answerList);
+      await validateAnsweredQuestions(questionList, participants, teams);
 
       await this.connection.transaction(
         async (manager: EntityManager): Promise<void> => {
           await manager
             .save(TeamEntity, teamList)
-            .then(() => this.logger.debug('teams saved'));
+            .then(() => this.logger.debug('Teams saved'));
           await manager
-            .save(MemberEntity, memberList)
-            .then(() => this.logger.debug('members saved'));
+            .save(ParticipantEntity, participantList)
+            .then(() => this.logger.debug('Participants saved'));
           this.logger.log('Leaderboard is updated');
         },
       );

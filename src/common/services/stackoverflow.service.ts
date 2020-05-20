@@ -8,20 +8,20 @@ import {
 } from 'common/config/constants';
 import {
   getAnswersUrl,
+  getParticipantStackoverflowIds,
   getQuestionsUrl,
-  getUsernames,
   getUsersUrl,
   splitBy,
 } from 'common/utils';
 import {
   validateAnswerCreationDate,
   validateEditedAnswer,
-  validateMemberName,
+  validateParticipantName,
   validateQuestionCreationDate,
   validateQuestionOwner,
   validateTeamMembers,
 } from 'common/utils/validations';
-import { Member } from 'modules/member/member.payload';
+import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
 
 async function getData(
@@ -63,11 +63,11 @@ async function getData(
   }
 }
 
-export async function getAnswerList(memberList: Member[]): Promise<any> {
-  const memberUsernames = memberList.map(
-    (member: Member): number => member.username,
+export async function getAnswerList(participantList: Participant[]): Promise<any> {
+  const participantUsernames = participantList.map(
+    (participant: Participant): number => participant.stackoverflow_id,
   );
-  const usernamesList = splitBy(ANSWERS_BATCH_SIZE, memberUsernames);
+  const usernamesList = splitBy(ANSWERS_BATCH_SIZE, participantUsernames);
   const answers = usernamesList
     .map((usernames: number[]): string => usernames.join(';'))
     .map((usernames: string): string => getAnswersUrl(usernames))
@@ -77,15 +77,15 @@ export async function getAnswerList(memberList: Member[]): Promise<any> {
 }
 
 export function getAnsweredQuestions(
-  members: Record<string, Member>,
+  participants: Record<string, Participant>,
   answers: any,
 ): Record<string, any> {
   const answeredQuestions = {};
 
   answers.forEach(answer => {
-    const member = members[answer.owner.user_id];
-    const isValidMember = validateMemberName(
-      member.name,
+    const participant = participants[answer.owner.user_id];
+    const isValidParticipant = validateParticipantName(
+      participant.name,
       answer.owner.display_name,
     );
     const isValidAnswerCreationDate =
@@ -95,7 +95,7 @@ export function getAnsweredQuestions(
       : validateEditedAnswer(answer.last_edit_date);
 
     if (
-      isValidMember &&
+      isValidParticipant &&
       isValidAnswerCreationDate &&
       isValidAnswerLastEditDate
     ) {
@@ -114,7 +114,7 @@ export function getAnsweredQuestions(
 
 export async function validateAnsweredQuestions(
   answeredQuestions: Record<string, any>,
-  members: Record<number, Member>,
+  participants: Record<number, Participant>,
   teams: Record<number, Team>,
 ): Promise<void> {
   const logger = new Logger(validateAnsweredQuestions.name);
@@ -134,12 +134,12 @@ export async function validateAnsweredQuestions(
 
   const questionList = await getData(questions);
   questionList.forEach(question => {
-    const participantIds = Object.keys(members).map(
+    const participantIds = Object.keys(participants).map(
       (participant: string): number => +participant,
     );
     const questionOwnerId = question.owner.user_id;
     const answeredQuestion = answeredQuestions[question.question_id];
-    const containsValidTag = question.tags.some(tag => TAGS.includes(tag));
+    const containsValidTag = question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
     const isValidQuestionOwner = validateQuestionOwner(
       questionOwnerId,
       participantIds,
@@ -152,14 +152,14 @@ export async function validateAnsweredQuestions(
       isValidQuestionCreationDate &&
       isValidQuestionOwner
     ) {
-      const memberIds = Object.keys(answeredQuestion);
-      memberIds.forEach(memberId => {
-        const member = members[memberId];
-        const answer = answeredQuestion[memberId];
+      const participantIds = Object.keys(answeredQuestion);
+      participantIds.forEach(participantId => {
+        const participant = participants[participantId];
+        const answer = answeredQuestion[participantId];
 
-        member.score += answer.score;
-        member.link = answer.owner.link;
-        teams[member.team_id].score += answer.score;
+        participant.score += answer.score;
+        participant.link = answer.owner.link;
+        teams[participant.team_id].score += answer.score;
         logger.debug(`${question.title}, score: ${answer.score}`);
       });
     }
@@ -168,9 +168,9 @@ export async function validateAnsweredQuestions(
 
 export async function validateTeam(team: Team): Promise<void> {
   const logger = new Logger(validateTeam.name);
-  const memberIds = getUsernames(team.members);
-  const members = await axios
-    .get(getUsersUrl(memberIds))
+  const participantStackoverflowIds = getParticipantStackoverflowIds(team.members);
+  const participants = await axios
+    .get(getUsersUrl(participantStackoverflowIds))
     .then(response => {
       logger.debug(
         `get users, remaining requests: ${response.data.quota_remaining}`,
@@ -181,5 +181,5 @@ export async function validateTeam(team: Team): Promise<void> {
       logger.error(`get users error: ${err}`);
       throw new BadRequestException(err);
     });
-  validateTeamMembers(members, team.members);
+  validateTeamMembers(participants, team.members);
 }

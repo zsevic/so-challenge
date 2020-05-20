@@ -21,7 +21,7 @@ import {
   QUESTION_END_HOURS,
   QUESTION_END_MINUTES,
 } from 'common/config/constants';
-import { Member } from 'modules/member/member.payload';
+import { Participant } from 'modules/participant/participant.payload';
 
 export const validateAnswerCreationDate = (creationDate: number): boolean => {
   const answerCreationDate = new Date(creationDate * 1000).getTime();
@@ -58,10 +58,10 @@ export const validateEditedAnswer = (lastEditDate: number): boolean => {
   );
 };
 
-export const validateMemberName = (
-  memberName: string,
+export const validateParticipantName = (
+  participantName: string,
   answerOwnerName: string,
-): boolean => memberName.localeCompare(answerOwnerName) === 0;
+): boolean => participantName.localeCompare(answerOwnerName) === 0;
 
 export const validateQuestionCreationDate = (creationDate: number): boolean => {
   const questionCreationDate = new Date(creationDate * 1000).getTime();
@@ -89,19 +89,19 @@ export const validateQuestionOwner = (
   participantIds: number[],
 ): boolean => !participantIds.includes(questionOwnerId);
 
-export function validateTeamMembers(users: any, teamMembers: Member[]): void {
+export function validateTeamMembers(users: any, teamMembers: Participant[]): void {
   if (users.length !== teamMembers.length) {
     throw new BadRequestException('Team members are not valid, length error');
   }
   const members = {};
-  teamMembers.forEach((member: Member): void => {
+  teamMembers.forEach((member: Participant): void => {
     const memberName = member.name.trim();
     if (members[memberName]) {
       throw new BadRequestException(
         `Team members are not valid, duplicate name ${member.name}`,
       );
     }
-    members[memberName] = member.username;
+    members[memberName] = member.stackoverflow_id;
   });
 
   users.forEach((user: any): void => {
@@ -110,7 +110,7 @@ export function validateTeamMembers(users: any, teamMembers: Member[]): void {
       members[user.display_name] !== user.user_id
     ) {
       throw new BadRequestException(
-        `Team member with username: ${user.user_id} is not valid`,
+        `Team member with Stackoverflow ID: ${user.user_id} is not valid`,
       );
     }
   });

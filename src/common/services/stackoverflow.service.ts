@@ -63,7 +63,9 @@ async function getData(
   }
 }
 
-export async function getAnswerList(participantList: Participant[]): Promise<any> {
+export async function getAnswerList(
+  participantList: Participant[],
+): Promise<any> {
   const participantUsernames = participantList.map(
     (participant: Participant): number => participant.stackoverflow_id,
   );
@@ -139,7 +141,8 @@ export async function validateAnsweredQuestions(
     );
     const questionOwnerId = question.owner.user_id;
     const answeredQuestion = answeredQuestions[question.question_id];
-    const containsValidTag = question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
+    const containsValidTag =
+      question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
     const isValidQuestionOwner = validateQuestionOwner(
       questionOwnerId,
       participantIds,
@@ -168,7 +171,9 @@ export async function validateAnsweredQuestions(
 
 export async function validateTeam(team: Team): Promise<void> {
   const logger = new Logger(validateTeam.name);
-  const participantStackoverflowIds = getParticipantStackoverflowIds(team.members);
+  const participantStackoverflowIds = getParticipantStackoverflowIds(
+    team.members,
+  );
   const participants = await axios
     .get(getUsersUrl(participantStackoverflowIds))
     .then(response => {

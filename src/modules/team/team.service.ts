@@ -20,10 +20,12 @@ export class TeamService {
     return this.connection.transaction(async (manager: EntityManager) => {
       const team = await this.teamRepository.createTeam(teamDto.name, manager);
 
-      const memberList = teamDto.members.map((participant: Participant): Participant => ({
-        ...participant,
-        team_id: team.id,
-      }));
+      const memberList = teamDto.members.map(
+        (participant: Participant): Participant => ({
+          ...participant,
+          team_id: team.id,
+        }),
+      );
 
       const members = await this.participantRepository.bulkCreateParticipants(
         memberList,

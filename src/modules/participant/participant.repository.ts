@@ -17,7 +17,9 @@ export class ParticipantRepository extends Repository<ParticipantEntity> {
       .values(participantList)
       .execute()
       .catch(() => {
-        throw new BadRequestException('Participant Stackoverflow IDs are not valid');
+        throw new BadRequestException(
+          'Participant Stackoverflow IDs are not valid',
+        );
       });
     const newParticipants = participantList.map(
       (participant: Participant, index: number): Participant => ({

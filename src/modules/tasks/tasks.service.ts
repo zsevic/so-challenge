@@ -2,14 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import {
-  getAnswerList,
-  getAnsweredQuestions,
-  validateAnsweredQuestions,
-} from 'common/services/stackoverflow.service';
+import { getAnsweredQuestions } from 'common/services/stackoverflow.service';
 import { initialize, isCronJobFinished } from 'common/utils';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { Participant } from 'modules/participant/participant.payload';
+import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
 import { TeamEntity } from 'modules/team/team.entity';
 import { Team } from 'modules/team/team.payload';
 import { TeamRepository } from 'modules/team/team.repository';
@@ -23,6 +20,7 @@ export class TasksService {
     @InjectConnection() private readonly connection: Connection,
     private readonly teamRepository: TeamRepository,
     private readonly schedulerRegistry: SchedulerRegistry,
+    private readonly stackoverflowService: StackoverflowService,
   ) {}
 
   @Cron(CronExpression.EVERY_2ND_HOUR, {
@@ -49,9 +47,15 @@ export class TasksService {
     const { participants, teams } = initialize(participantList, teamList);
 
     try {
-      const answerList = await getAnswerList(participantList);
+      const answerList = await this.stackoverflowService.getAnswerList(
+        participantList,
+      );
       const questionList = getAnsweredQuestions(participants, answerList);
-      await validateAnsweredQuestions(questionList, participants, teams);
+      await this.stackoverflowService.validateAnsweredQuestions(
+        questionList,
+        participants,
+        teams,
+      );
 
       await this.connection.transaction(
         async (manager: EntityManager): Promise<void> => {

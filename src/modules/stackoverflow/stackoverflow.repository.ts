@@ -46,4 +46,19 @@ export class StackoverflowRepository {
       throw new BadRequestException(err);
     }
   }
+
+  async getUsers(usersUrl: string): Promise<any> {
+    return axios
+      .get(usersUrl)
+      .then(response => {
+        this.logger.debug(
+          `get users, remaining requests: ${response.data.quota_remaining}`,
+        );
+        return response.data.items;
+      })
+      .catch(err => {
+        this.logger.error(`get users error: ${err}`);
+        throw new BadRequestException(err);
+      });
+  }
 }

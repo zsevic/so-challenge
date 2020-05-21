@@ -1,15 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
 import {
-  USERS_BATCH_SIZE,
+  ANSWERS_END_TIMESTAMP,
+  ANSWERS_START_TIMESTAMP,
   QUESTIONS_BATCH_SIZE,
+  QUESTIONS_END_TIMESTAMP,
+  QUESTIONS_START_TIMESTAMP,
+  QUESTIONS_PAGE_SIZE,
+  QUESTIONS_START_YEAR,
+  QUESTIONS_START_MONTH,
+  QUESTIONS_START_DAY,
+  QUESTIONS_END_YEAR,
+  QUESTIONS_END_MONTH,
+  QUESTIONS_END_DAY,
   TAGS,
+  USERS_BATCH_SIZE,
+  USERS_PAGE_SIZE,
+  ANSWERS_START_YEAR,
+  ANSWERS_START_MONTH,
+  ANSWERS_START_DAY,
+  ANSWER_END_YEAR,
+  ANSWER_END_MONTH,
+  ANSWER_END_DAY,
 } from 'common/config/constants';
-import { getAnswersUrl, splitBy, getQuestionsUrl } from 'common/utils';
-import {
-  validateQuestionOwner,
-  validateQuestionCreationDate,
-} from 'common/utils/validations';
+import { splitBy, getQueryParameterDateFormat } from 'common/utils';
 import { Participant } from 'modules/participant/participant.payload';
 import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
 import { Team } from 'modules/team/team.payload';
@@ -21,7 +35,31 @@ export class StackoverflowService {
     private readonly stackoverflowRepository: StackoverflowRepository,
   ) {}
 
-  async getAnswerList(participantList: Participant[]): Promise<any> {
+  getAnsweredQuestions = (
+    participants: Record<string, Participant>,
+    answers: any,
+  ): Record<string, any> => {
+    const answeredQuestions = {};
+
+    answers.forEach((answer: any): void => {
+      const { name: participantName } = participants[answer.owner.user_id];
+      const isValidAnswer = this.validateAnswer(answer, participantName);
+
+      if (isValidAnswer) {
+        const questionId = +answer.question_id;
+        if (!answeredQuestions[answer.question_id]) {
+          answeredQuestions[questionId] = {
+            [answer.owner.user_id]: answer,
+          };
+        } else {
+          answeredQuestions[questionId][answer.owner.user_id] = answer;
+        }
+      }
+    });
+    return answeredQuestions;
+  };
+
+  getAnswerList = async (participantList: Participant[]): Promise<any> => {
     const participantsStackoverflowIds = participantList.map(
       (participant: Participant): number => participant.stackoverflow_id,
     );
@@ -33,17 +71,95 @@ export class StackoverflowService {
       .map((participantsStackoverflowIds: number[]): string =>
         participantsStackoverflowIds.join(';'),
       )
-      .map((usersIds: string): string => getAnswersUrl(usersIds))
+      .map((usersIds: string): string => this.getAnswersUrl(usersIds))
       .map((answersUrl: string) => axios.get(answersUrl));
 
     return this.stackoverflowRepository.getData(answers);
-  }
+  };
 
-  async validateAnsweredQuestions(
+  getAnswersUrl = (
+    usersIds: string,
+    pagesize = USERS_PAGE_SIZE,
+    page = 1,
+  ): string => {
+    const ANSWERS_FROM_DATE = getQueryParameterDateFormat(
+      ANSWERS_START_YEAR,
+      ANSWERS_START_MONTH,
+      ANSWERS_START_DAY,
+    );
+    const ANSWERS_TO_DATE = getQueryParameterDateFormat(
+      ANSWER_END_YEAR,
+      ANSWER_END_MONTH,
+      ANSWER_END_DAY,
+    );
+
+    return `https://api.stackexchange.com/2.2/users/${usersIds}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+  };
+
+  getParticipantIds = (participantList: Participant[]): string =>
+    participantList
+      .map((participant: Participant): number => participant.stackoverflow_id)
+      .join(';');
+
+  getQuestionsUrl = (
+    questionsIds: string,
+    pagesize = QUESTIONS_PAGE_SIZE,
+    page = 1,
+  ): string => {
+    const QUESTIONS_FROM_DATE = getQueryParameterDateFormat(
+      QUESTIONS_START_YEAR,
+      QUESTIONS_START_MONTH,
+      QUESTIONS_START_DAY,
+    );
+    const QUESTIONS_TO_DATE = getQueryParameterDateFormat(
+      QUESTIONS_END_YEAR,
+      QUESTIONS_END_MONTH,
+      QUESTIONS_END_DAY,
+    );
+
+    return `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+  };
+
+  getUsersUrl = (usersIds: string): string =>
+    `https://api.stackexchange.com/2.2/users/${usersIds}?site=stackoverflow`;
+
+  getUsers = async (team: Team): Promise<void> => {
+    const ids = this.getParticipantIds(team.members);
+    const usersUrl = this.getUsersUrl(ids);
+    return this.stackoverflowRepository.getUsers(usersUrl);
+  };
+
+  validateAnswerCreationDate = (creationDate: number): boolean => {
+    const answerCreationDate = new Date(creationDate * 1000).getTime();
+    return (
+      ANSWERS_START_TIMESTAMP <= answerCreationDate &&
+      answerCreationDate <= ANSWERS_END_TIMESTAMP
+    );
+  };
+
+  validateAnswer = (answer: any, participantName: string): boolean => {
+    const isValidParticipant = this.validateParticipantName(
+      participantName,
+      answer.owner.display_name,
+    );
+    const isValidAnswerCreationDate =
+      answer.creation_date &&
+      this.validateAnswerCreationDate(answer.creation_date);
+    const isValidAnswerLastEditDate = !answer.last_edit_date
+      ? true
+      : this.validateEditedAnswer(answer.last_edit_date);
+    return (
+      isValidParticipant &&
+      isValidAnswerCreationDate &&
+      isValidAnswerLastEditDate
+    );
+  };
+
+  validateAnsweredQuestions = async (
     answeredQuestions: Record<string, any>,
     participants: Record<number, Participant>,
     teams: Record<number, Team>,
-  ): Promise<void> {
+  ): Promise<void> => {
     const answeredQuestionsIds = Object.keys(answeredQuestions).map(
       (id: string): number => +id,
     );
@@ -58,7 +174,7 @@ export class StackoverflowService {
     );
     const questions = questionsIdsList
       .map((questionsIds: number[]): string => questionsIds.join(';'))
-      .map((questionsIds: string): string => getQuestionsUrl(questionsIds))
+      .map((questionsIds: string): string => this.getQuestionsUrl(questionsIds))
       .map((questionsUrl: string) => axios.get(questionsUrl));
 
     const questionList = await this.stackoverflowRepository.getData(questions);
@@ -66,22 +182,10 @@ export class StackoverflowService {
       const participantIds = Object.keys(participants).map(
         (participant: string): number => +participant,
       );
-      const questionOwnerId = question.owner.user_id;
       const answeredQuestion = answeredQuestions[question.question_id];
-      const containsValidTag =
-        question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
-      const isValidQuestionOwner = validateQuestionOwner(
-        questionOwnerId,
-        participantIds,
-      );
-      const isValidQuestionCreationDate =
-        question.creation_date &&
-        validateQuestionCreationDate(question.creation_date);
-      if (
-        containsValidTag &&
-        isValidQuestionCreationDate &&
-        isValidQuestionOwner
-      ) {
+      const isValidQuestion = this.validateQuestion(question, participantIds);
+
+      if (isValidQuestion) {
         const participantIds = Object.keys(answeredQuestion);
         participantIds.forEach(participantId => {
           const participant = participants[participantId];
@@ -94,5 +198,70 @@ export class StackoverflowService {
         });
       }
     });
-  }
+  };
+
+  validateEditedAnswer = (lastEditDate: number): boolean => {
+    const answerLastEditDate = new Date(lastEditDate * 1000).getTime();
+    return answerLastEditDate <= ANSWERS_END_TIMESTAMP;
+  };
+
+  validateParticipantName = (
+    participantName: string,
+    answerOwnerName: string,
+  ): boolean => participantName.localeCompare(answerOwnerName) === 0;
+
+  validateQuestion = (question: any, participantIds: number[]): boolean => {
+    const containsValidTag =
+      question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
+    const isValidQuestionOwner = this.validateQuestionOwner(
+      question.owner.user_id,
+      participantIds,
+    );
+    const isValidQuestionCreationDate =
+      question.creation_date &&
+      this.validateQuestionCreationDate(question.creation_date);
+    return (
+      containsValidTag && isValidQuestionCreationDate && isValidQuestionOwner
+    );
+  };
+
+  validateQuestionCreationDate = (creationDate: number): boolean => {
+    const questionCreationDate = new Date(creationDate * 1000).getTime();
+    return (
+      QUESTIONS_START_TIMESTAMP <= questionCreationDate &&
+      questionCreationDate <= QUESTIONS_END_TIMESTAMP
+    );
+  };
+
+  validateQuestionOwner = (
+    questionOwnerId: number,
+    participantIds: number[],
+  ): boolean => !participantIds.includes(questionOwnerId);
+
+  validateTeamMembers = (users: any, teamMembers: Participant[]): void => {
+    if (users.length !== teamMembers.length) {
+      throw new BadRequestException('Team members are not valid, length error');
+    }
+    const members = {};
+    teamMembers.forEach((member: Participant): void => {
+      const memberName = member.name.trim();
+      if (members[memberName]) {
+        throw new BadRequestException(
+          `Team members are not valid, duplicate name ${member.name}`,
+        );
+      }
+      members[memberName] = member.stackoverflow_id;
+    });
+
+    users.forEach((user: any): void => {
+      if (
+        !members[user.display_name] ||
+        members[user.display_name] !== user.user_id
+      ) {
+        throw new BadRequestException(
+          `Team member with Stackoverflow ID: ${user.user_id} is not valid`,
+        );
+      }
+    });
+  };
 }

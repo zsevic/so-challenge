@@ -31,7 +31,7 @@ export class TeamController {
       title: 'SO challenge - Leaderboard',
       page: 'leaderboard',
     };
-    const teams = await this.teamService.getLeaderboard();
+    const teams = await this.teamService.getTeamList();
     if (teams.length === 0) {
       return res.render('leaderboard-no-teams', data);
     }

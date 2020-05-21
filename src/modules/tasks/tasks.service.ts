@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { getAnsweredQuestions } from 'common/services/stackoverflow.service';
 import { initialize, isCronJobFinished } from 'common/utils';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { Participant } from 'modules/participant/participant.payload';
@@ -50,7 +49,10 @@ export class TasksService {
       const answerList = await this.stackoverflowService.getAnswerList(
         participantList,
       );
-      const questionList = getAnsweredQuestions(participants, answerList);
+      const questionList = this.stackoverflowService.getAnsweredQuestions(
+        participants,
+        answerList,
+      );
       await this.stackoverflowService.validateAnsweredQuestions(
         questionList,
         participants,

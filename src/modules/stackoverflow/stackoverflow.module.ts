@@ -4,6 +4,6 @@ import { StackoverflowService } from './stackoverflow.service';
 
 @Module({
   providers: [StackoverflowService, StackoverflowRepository],
-  exports: [StackoverflowService],
+  exports: [StackoverflowService, StackoverflowRepository],
 })
 export class StackoverflowModule {}

@@ -1,41 +1,82 @@
 import { formatDistanceToNow } from 'date-fns';
 import {
-  ANSWERS_FROM_DATE,
-  ANSWERS_TO_DATE,
-  ANSWERS_PAGE_SIZE,
+  ANSWERS_START_YEAR,
+  ANSWERS_START_MONTH,
+  ANSWERS_START_DAY,
+  ANSWER_END_YEAR,
+  ANSWER_END_MONTH,
+  ANSWER_END_DAY,
   LEADERBOARD_END_YEAR,
   LEADERBOARD_END_MONTH,
   LEADERBOARD_END_DAY,
   LEADERBOARD_END_HOURS,
   LEADERBOARD_END_MINUTES,
-  QUESTIONS_FROM_DATE,
-  QUESTIONS_TO_DATE,
+  QUESTIONS_END_YEAR,
+  QUESTIONS_END_MONTH,
+  QUESTIONS_END_DAY,
+  QUESTIONS_START_YEAR,
+  QUESTIONS_START_MONTH,
+  QUESTIONS_START_DAY,
   QUESTIONS_PAGE_SIZE,
   REGISTRATION_END_YEAR,
   REGISTRATION_END_MONTH,
   REGISTRATION_END_DAY,
   REGISTRATION_END_HOURS,
   REGISTRATION_END_MINUTES,
+  USERS_PAGE_SIZE,
 } from 'common/config/constants';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
 
+export function getQueryParameterDateFormat(
+  year: number,
+  month: number,
+  day: number,
+): string {
+  const monthValue = month < 9 ? `0${month + 1}` : month + 1;
+  return `${year}-${monthValue}-${day}`;
+}
+
 export const getAnswersUrl = (
-  usernames: string,
-  pagesize = ANSWERS_PAGE_SIZE,
+  usersIds: string,
+  pagesize = USERS_PAGE_SIZE,
   page = 1,
-): string =>
-  `https://api.stackexchange.com/2.2/users/${usernames}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+): string => {
+  const ANSWERS_FROM_DATE = getQueryParameterDateFormat(
+    ANSWERS_START_YEAR,
+    ANSWERS_START_MONTH,
+    ANSWERS_START_DAY,
+  );
+  const ANSWERS_TO_DATE = getQueryParameterDateFormat(
+    ANSWER_END_YEAR,
+    ANSWER_END_MONTH,
+    ANSWER_END_DAY,
+  );
+
+  return `https://api.stackexchange.com/2.2/users/${usersIds}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+};
 
 export const getQuestionsUrl = (
   questionsIds: string,
   pagesize = QUESTIONS_PAGE_SIZE,
   page = 1,
-): string =>
-  `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+): string => {
+  const QUESTIONS_FROM_DATE = getQueryParameterDateFormat(
+    QUESTIONS_START_YEAR,
+    QUESTIONS_START_MONTH,
+    QUESTIONS_START_DAY,
+  );
+  const QUESTIONS_TO_DATE = getQueryParameterDateFormat(
+    QUESTIONS_END_YEAR,
+    QUESTIONS_END_MONTH,
+    QUESTIONS_END_DAY,
+  );
 
-export const getUsersUrl = (usernames: string): string =>
-  `https://api.stackexchange.com/2.2/users/${usernames}?site=stackoverflow`;
+  return `https://api.stackexchange.com/2.2/questions/${questionsIds}?site=stackoverflow&fromdate=${QUESTIONS_FROM_DATE}&todate=${QUESTIONS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
+};
+
+export const getUsersUrl = (usersIds: string): string =>
+  `https://api.stackexchange.com/2.2/users/${usersIds}?site=stackoverflow`;
 
 export const getParticipantStackoverflowIds = (
   participantList: Participant[],
@@ -43,15 +84,6 @@ export const getParticipantStackoverflowIds = (
   participantList
     .map((participant: Participant): number => participant.stackoverflow_id)
     .join(';');
-
-export const getQueryParameterDateFormat = (
-  year: number,
-  month: number,
-  day: number,
-): string => {
-  const monthValue = month < 9 ? `0${month + 1}` : month + 1;
-  return `${year}-${monthValue}-${day}`;
-};
 
 export const LEADERBOARD_END = new Date(
   LEADERBOARD_END_YEAR,

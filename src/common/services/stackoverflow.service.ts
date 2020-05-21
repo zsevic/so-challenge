@@ -2,9 +2,9 @@ import { parse } from 'url';
 import { BadRequestException, Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import {
-  ANSWERS_BATCH_SIZE,
   QUESTIONS_BATCH_SIZE,
   TAGS,
+  USERS_BATCH_SIZE,
 } from 'common/config/constants';
 import {
   getAnswersUrl,
@@ -66,13 +66,18 @@ async function getData(
 export async function getAnswerList(
   participantList: Participant[],
 ): Promise<any> {
-  const participantUsernames = participantList.map(
+  const participantsStackoverflowIds = participantList.map(
     (participant: Participant): number => participant.stackoverflow_id,
   );
-  const usernamesList = splitBy(ANSWERS_BATCH_SIZE, participantUsernames);
-  const answers = usernamesList
-    .map((usernames: number[]): string => usernames.join(';'))
-    .map((usernames: string): string => getAnswersUrl(usernames))
+  const participantsStackoverflowIdsList = splitBy(
+    USERS_BATCH_SIZE,
+    participantsStackoverflowIds,
+  );
+  const answers = participantsStackoverflowIdsList
+    .map((participantsStackoverflowIds: number[]): string =>
+      participantsStackoverflowIds.join(';'),
+    )
+    .map((usersIds: string): string => getAnswersUrl(usersIds))
     .map((answersUrl: string) => axios.get(answersUrl));
 
   return getData(answers);

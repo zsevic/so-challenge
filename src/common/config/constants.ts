@@ -1,14 +1,12 @@
-import { getQueryParameterDateFormat } from 'common/utils';
-
-const ANSWERS_START_YEAR = 2010;
-const ANSWERS_START_MONTH = 3; // +1
-const ANSWERS_START_DAY = 10;
+export const ANSWERS_START_YEAR = 2010;
+export const ANSWERS_START_MONTH = 3; // +1
+export const ANSWERS_START_DAY = 10;
 const ANSWERS_START_HOURS = 3;
 const ANSWERS_START_MINUTES = 0;
 
-const ANSWER_END_YEAR = 2020;
-const ANSWER_END_MONTH = 4; // +1
-const ANSWER_END_DAY = 11;
+export const ANSWER_END_YEAR = 2020;
+export const ANSWER_END_MONTH = 4; // +1
+export const ANSWER_END_DAY = 11;
 const ANSWER_END_HOURS = 16;
 const ANSWER_END_MINUTES = 0;
 
@@ -28,26 +26,15 @@ export const ANSWERS_END_TIMESTAMP = new Date(
   ANSWER_END_MINUTES,
 ).getTime();
 
-export const ANSWERS_FROM_DATE = getQueryParameterDateFormat(
-  ANSWERS_START_YEAR,
-  ANSWERS_START_MONTH,
-  ANSWERS_START_DAY,
-);
-export const ANSWERS_TO_DATE = getQueryParameterDateFormat(
-  ANSWER_END_YEAR,
-  ANSWER_END_MONTH,
-  ANSWER_END_DAY,
-);
-
-const QUESTIONS_START_YEAR = 2010;
-const QUESTIONS_START_MONTH = 0; // +1
-const QUESTIONS_START_DAY = 10;
+export const QUESTIONS_START_YEAR = 2010;
+export const QUESTIONS_START_MONTH = 0; // +1
+export const QUESTIONS_START_DAY = 10;
 const QUESTIONS_START_HOURS = 3;
 const QUESTIONS_START_MINUTES = 0;
 
-const QUESTIONS_END_YEAR = 2020;
-const QUESTIONS_END_MONTH = 4; // +1
-const QUESTIONS_END_DAY = 11;
+export const QUESTIONS_END_YEAR = 2020;
+export const QUESTIONS_END_MONTH = 4; // +1
+export const QUESTIONS_END_DAY = 11;
 const QUESTIONS_END_HOURS = 16;
 const QUESTIONS_END_MINUTES = 0;
 
@@ -67,17 +54,6 @@ export const QUESTIONS_END_TIMESTAMP = new Date(
   QUESTIONS_END_MINUTES,
 ).getTime();
 
-export const QUESTIONS_FROM_DATE = getQueryParameterDateFormat(
-  QUESTIONS_START_YEAR,
-  QUESTIONS_START_MONTH,
-  QUESTIONS_START_DAY,
-);
-export const QUESTIONS_TO_DATE = getQueryParameterDateFormat(
-  QUESTIONS_END_YEAR,
-  QUESTIONS_END_MONTH,
-  QUESTIONS_END_DAY,
-);
-
 export const LEADERBOARD_END_YEAR = 2021;
 export const LEADERBOARD_END_MONTH = 3; // +1
 export const LEADERBOARD_END_DAY = 24;
@@ -92,8 +68,8 @@ export const REGISTRATION_END_MINUTES = 0;
 
 export const TAGS = [];
 
-export const ANSWERS_BATCH_SIZE = 100;
-export const QUESTIONS_BATCH_SIZE = 100;
+export const USERS_BATCH_SIZE = 100;
+export const USERS_PAGE_SIZE = 100;
 
-export const ANSWERS_PAGE_SIZE = 100;
+export const QUESTIONS_BATCH_SIZE = 100;
 export const QUESTIONS_PAGE_SIZE = 100;

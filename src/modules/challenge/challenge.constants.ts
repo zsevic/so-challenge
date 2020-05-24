@@ -66,7 +66,7 @@ export const REGISTRATION_END_DAY = 24;
 export const REGISTRATION_END_HOURS = 16;
 export const REGISTRATION_END_MINUTES = 0;
 
-export const TAGS = [];
+export const QUESTION_TAGS = [];
 
 export const USERS_BATCH_SIZE = 100;
 export const USERS_PAGE_SIZE = 100;

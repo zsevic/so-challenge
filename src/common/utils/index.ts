@@ -10,7 +10,7 @@ import {
   REGISTRATION_END_DAY,
   REGISTRATION_END_HOURS,
   REGISTRATION_END_MINUTES,
-} from 'common/config/constants';
+} from 'modules/challenge/challenge.constants';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
 

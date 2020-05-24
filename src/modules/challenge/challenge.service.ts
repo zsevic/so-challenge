@@ -13,7 +13,7 @@ import {
   QUESTIONS_END_YEAR,
   QUESTIONS_END_MONTH,
   QUESTIONS_END_DAY,
-  TAGS,
+  QUESTION_TAGS,
   USERS_BATCH_SIZE,
   USERS_PAGE_SIZE,
   ANSWERS_START_YEAR,
@@ -22,7 +22,7 @@ import {
   ANSWER_END_YEAR,
   ANSWER_END_MONTH,
   ANSWER_END_DAY,
-} from 'common/config/constants';
+} from 'modules/challenge/challenge.constants';
 import {
   getQueryParameterDateFormat,
   REGISTRATION_END,
@@ -211,8 +211,10 @@ export class ChallengeService {
   ): boolean => participantName.localeCompare(answerOwnerName) === 0;
 
   validateQuestion = (question: any, participantIds: number[]): boolean => {
-    const containsValidTag =
-      question.tags.some(tag => TAGS.includes(tag)) || TAGS.length === 0;
+    const containsValidTag = this.validateIfQuestionContainsValidTag(
+      question.tags,
+    );
+
     const isValidQuestionOwner = this.validateQuestionOwner(
       question.owner.user_id,
       participantIds,
@@ -237,6 +239,10 @@ export class ChallengeService {
     questionOwnerId: number,
     participantIds: number[],
   ): boolean => !participantIds.includes(questionOwnerId);
+
+  validateIfQuestionContainsValidTag = (tags: string[]): boolean =>
+    tags.some((tag: string): boolean => QUESTION_TAGS.includes(tag)) ||
+    QUESTION_TAGS.length === 0;
 
   async validateTeam(team: Team): Promise<void> {
     const teamMembers = await this.getUsers(team);

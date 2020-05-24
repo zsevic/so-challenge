@@ -3,7 +3,7 @@ import * as expressHandlebars from 'express-handlebars';
 
 export const templateEngineConfig = expressHandlebars({
   extname: 'hbs',
-  defaultLayout: 'index',
+  defaultLayout: 'main',
   helpers: {
     inc: (value: string): number => parseInt(value, 10) + 1,
     ifeq: (a: string, b: string, options) =>

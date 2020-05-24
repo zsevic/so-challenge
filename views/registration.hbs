@@ -1,76 +1,65 @@
-<!DOCTYPE html>
-<html>
+<h1 class="lead text-center mt-2">Registration</h1>
+<p class="text-muted text-center">{{registrationEnd}}</p>
+<div class="row justify-content-center">
+  <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
+    <form class="text-center border border-light p-5" id="registration-form">
+      <p class="text-left">Team name</p>
+      <input type="text" class="form-control mb-4" placeholder="Team name" name="name" required>
 
-{{>head}}
-
-<body>
-  {{>nav}}
-  <h1 class="lead text-center mt-2">Registration</h1>
-  <p class="text-muted text-center">{{registrationEnd}}</p>
-  <div class="row justify-content-center">
-    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
-      <form class="text-center border border-light p-5" id="registration-form">
-        <p class="text-left">Team name</p>
-        <input type="text" class="form-control mb-4" placeholder="Team name" name="name" required>
-
-        <p class="text-left">First member</p>
-        <div class="form-row mb-4">
-          <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[0][name]" required>
-          </div>
-          <span class="visible-xs my-2">
-            <hr /></span>
-          <div class="col-xs-12 col-sm-6">
-            <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
-              name="members[0][stackoverflow_id]" required>
-          </div>
+      <p class="text-left">First member</p>
+      <div class="form-row mb-4">
+        <div class="col-xs-12 col-sm-6">
+          <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[0][name]" required>
         </div>
-
-        <p class="text-left">Second member</p>
-        <div class="form-row mb-4">
-          <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[1][name]" required>
-          </div>
-          <span class="visible-xs my-2">
-            <hr /></span>
-          <div class="col-xs-12 col-sm-6">
-            <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
-              name="members[1][stackoverflow_id]" required>
-          </div>
+        <span class="visible-xs my-2">
+          <hr /></span>
+        <div class="col-xs-12 col-sm-6">
+          <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
+            name="members[0][stackoverflow_id]" required>
         </div>
+      </div>
 
-        <p class="text-left">Third member</p>
-        <div class="form-row mb-4">
-          <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[2][name]" required>
-          </div>
-          <span class="visible-xs my-2">
-            <hr /></span>
-          <div class="col-xs-12 col-sm-6">
-            <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
-              name="members[2][stackoverflow_id]" required>
-          </div>
+      <p class="text-left">Second member</p>
+      <div class="form-row mb-4">
+        <div class="col-xs-12 col-sm-6">
+          <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[1][name]" required>
         </div>
-
-        <p class="text-left">Fourth member</p>
-        <div class="form-row mb-4">
-          <div class="col-xs-12 col-sm-6">
-            <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[3][name]">
-          </div>
-          <span class="visible-xs my-2">
-            <hr /></span>
-          <div class="col-xs-12 col-sm-6">
-            <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
-              name="members[3][stackoverflow_id]">
-          </div>
+        <span class="visible-xs my-2">
+          <hr /></span>
+        <div class="col-xs-12 col-sm-6">
+          <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
+            name="members[1][stackoverflow_id]" required>
         </div>
+      </div>
 
-        <button class="btn btn-info my-4 btn-block" type="submit">Register team</button>
+      <p class="text-left">Third member</p>
+      <div class="form-row mb-4">
+        <div class="col-xs-12 col-sm-6">
+          <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[2][name]" required>
+        </div>
+        <span class="visible-xs my-2">
+          <hr /></span>
+        <div class="col-xs-12 col-sm-6">
+          <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
+            name="members[2][stackoverflow_id]" required>
+        </div>
+      </div>
 
-      </form>
-    </div>
+      <p class="text-left">Fourth member</p>
+      <div class="form-row mb-4">
+        <div class="col-xs-12 col-sm-6">
+          <input type="text" class="form-control" placeholder="Stackoverflow name" name="members[3][name]">
+        </div>
+        <span class="visible-xs my-2">
+          <hr /></span>
+        <div class="col-xs-12 col-sm-6">
+          <input type="number" class="form-control" min="1" max="9999999" placeholder="Stackoverflow user id"
+            name="members[3][stackoverflow_id]">
+        </div>
+      </div>
+
+      <button class="btn btn-info my-4 btn-block" type="submit">Register team</button>
+
+    </form>
   </div>
-  {{>scripts}}
-</body>
-
-</html>
+</div>

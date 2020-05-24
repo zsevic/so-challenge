@@ -3,7 +3,6 @@ import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
-import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamRepository } from './team.repository';
@@ -14,7 +13,6 @@ export class TeamService {
     @InjectConnection() private readonly connection: Connection,
     private readonly participantRepository: ParticipantRepository,
     private readonly teamRepository: TeamRepository,
-    private readonly stackoverflowService: StackoverflowService,
   ) {}
 
   async createTeam(teamDto: CreateTeamDto): Promise<Team> {

@@ -1,6 +1,8 @@
 import { getConnectionToken } from '@nestjs/typeorm';
 
-export const mockConnectionProvider = {
+export const connectionProviderMock = {
   provide: getConnectionToken(),
-  useValue: {},
+  useValue: {
+    transaction: () => [],
+  },
 };

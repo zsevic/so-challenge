@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { initialize, isCronJobFinished } from 'common/utils';
+import { initialize, LEADERBOARD_END } from 'common/utils';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { Participant } from 'modules/participant/participant.payload';
 import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
@@ -22,6 +22,9 @@ export class TasksService {
     private readonly stackoverflowService: StackoverflowService,
   ) {}
 
+  validateIfCronJobFinished = (): boolean =>
+    LEADERBOARD_END <= new Date().getTime();
+
   @Cron(CronExpression.EVERY_2ND_HOUR, {
     name: CRON_JOB_NAME,
   })
@@ -29,7 +32,8 @@ export class TasksService {
     if (process.env.NODE_APP_INSTANCE && process.env.NODE_APP_INSTANCE !== '0')
       return;
 
-    if (isCronJobFinished()) {
+    const isCronJobFinished = this.validateIfCronJobFinished();
+    if (isCronJobFinished) {
       const job = this.schedulerRegistry.getCronJob(CRON_JOB_NAME);
       job.stop();
 

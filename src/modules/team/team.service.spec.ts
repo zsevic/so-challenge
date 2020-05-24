@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { mockConnectionProvider } from 'common/mocks';
+import { connectionProviderMock } from 'common/mocks';
+import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
 import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
@@ -13,7 +14,7 @@ describe('TeamService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        mockConnectionProvider,
+        connectionProviderMock,
         ParticipantRepository,
         StackoverflowRepository,
         StackoverflowService,
@@ -24,6 +25,47 @@ describe('TeamService', () => {
 
     service = module.get<TeamService>(TeamService);
     repository = module.get<TeamRepository>(TeamRepository);
+  });
+
+  it('should create a team', async () => {
+    const team = {
+      name: 'team1',
+      members: [
+        {
+          name: 'Andy LifeBrixx',
+          stackoverflow_id: 335384,
+        },
+        {
+          name: 'user235254',
+          stackoverflow_id: 235254,
+        },
+        {
+          name: 'user235384',
+          stackoverflow_id: 235384,
+        },
+      ],
+    };
+    const teamId = '370b670e-6d78-44de-be26-3d3af4d02faf';
+    const participantIds = [
+      'c51555dd-4e44-4259-a89a-f5f82b4b599e',
+      '55be4f25-36d0-447b-8e3e-c297ac647026',
+      '613dd7e4-50a1-4f27-a0a7-f572ac27e268',
+    ];
+    const score = 0;
+    const createdTeam = {
+      ...team,
+      members: team.members.map(
+        (member: Participant, index: number): Participant => ({
+          ...member,
+          id: participantIds[index],
+          score,
+          team_id: teamId,
+        }),
+      ),
+      score,
+    };
+
+    expect(await service.createTeam(team)).toMatchObject(createdTeam);
   });
 
   it('should return an array of teams', async () => {

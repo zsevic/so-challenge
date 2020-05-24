@@ -2,8 +2,8 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { parse } from 'url';
 
-export class StackoverflowRepository {
-  private readonly logger = new Logger(StackoverflowRepository.name);
+export class ChallengeRepository {
+  private readonly logger = new Logger(ChallengeRepository.name);
 
   async getData(
     apiCalls: Promise<AxiosResponse<any>>[],

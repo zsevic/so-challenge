@@ -11,7 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
 import { getEnd, LEADERBOARD_END, REGISTRATION_END } from 'common/utils';
 import { Participant } from 'modules/participant/participant.payload';
-import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
+import { ChallengeService } from 'modules/challenge/challenge.service';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
@@ -20,7 +20,7 @@ import { TeamService } from './team.service';
 @ApiTags('teams')
 export class TeamController {
   constructor(
-    private readonly stackoverflowService: StackoverflowService,
+    private readonly challengeService: ChallengeService,
     private readonly teamService: TeamService,
   ) {}
 
@@ -80,7 +80,7 @@ export class TeamController {
       title: 'SO challenge - Registration',
       page: 'registration',
     };
-    const isRegistrationEnded = this.stackoverflowService.validateIfRegistrationEnded();
+    const isRegistrationEnded = this.challengeService.validateIfRegistrationEnded();
     if (isRegistrationEnded) {
       return res.render('registration-ended', data);
     }
@@ -94,11 +94,11 @@ export class TeamController {
 
   @Post('teams')
   async registerTeam(@Body() teamDto: CreateTeamDto): Promise<Team> {
-    const isRegistrationEnded = this.stackoverflowService.validateIfRegistrationEnded();
+    const isRegistrationEnded = this.challengeService.validateIfRegistrationEnded();
     if (isRegistrationEnded) {
       throw new BadRequestException('Registration is ended');
     }
-    await this.stackoverflowService.validateTeam(teamDto);
+    await this.challengeService.validateTeam(teamDto);
 
     return this.teamService.createTeam(teamDto);
   }

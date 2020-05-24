@@ -28,16 +28,14 @@ import {
   REGISTRATION_END,
   splitBy,
 } from 'common/utils';
+import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { Participant } from 'modules/participant/participant.payload';
-import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
 import { Team } from 'modules/team/team.payload';
 
 @Injectable()
-export class StackoverflowService {
-  private readonly logger = new Logger(StackoverflowService.name);
-  constructor(
-    private readonly stackoverflowRepository: StackoverflowRepository,
-  ) {}
+export class ChallengeService {
+  private readonly logger = new Logger(ChallengeService.name);
+  constructor(private readonly challengeRepository: ChallengeRepository) {}
 
   getAnsweredQuestions = (
     participants: Record<string, Participant>,
@@ -64,21 +62,16 @@ export class StackoverflowService {
   };
 
   getAnswerList = async (participantList: Participant[]): Promise<any> => {
-    const participantsStackoverflowIds = participantList.map(
+    const participantIds = participantList.map(
       (participant: Participant): number => participant.stackoverflow_id,
     );
-    const participantsStackoverflowIdsList = splitBy(
-      USERS_BATCH_SIZE,
-      participantsStackoverflowIds,
-    );
-    const answers = participantsStackoverflowIdsList
-      .map((participantsStackoverflowIds: number[]): string =>
-        participantsStackoverflowIds.join(';'),
-      )
+    const participantIdsList = splitBy(USERS_BATCH_SIZE, participantIds);
+    const answers = participantIdsList
+      .map((ids: number[]): string => ids.join(';'))
       .map((usersIds: string): string => this.getAnswersUrl(usersIds))
       .map((answersUrl: string) => axios.get(answersUrl));
 
-    return this.stackoverflowRepository.getData(answers);
+    return this.challengeRepository.getData(answers);
   };
 
   getAnswersUrl = (
@@ -130,7 +123,7 @@ export class StackoverflowService {
   getUsers = async (team: Team): Promise<void> => {
     const ids = this.getParticipantIds(team.members);
     const usersUrl = this.getUsersUrl(ids);
-    return this.stackoverflowRepository.getUsers(usersUrl);
+    return this.challengeRepository.getUsers(usersUrl);
   };
 
   validateAnswerCreationDate = (creationDate: number): boolean => {
@@ -181,7 +174,7 @@ export class StackoverflowService {
       .map((questionsIds: string): string => this.getQuestionsUrl(questionsIds))
       .map((questionsUrl: string) => axios.get(questionsUrl));
 
-    const questionList = await this.stackoverflowRepository.getData(questions);
+    const questionList = await this.challengeRepository.getData(questions);
     questionList.forEach(question => {
       const participantIds = Object.keys(participants).map(
         (participant: string): number => +participant,

@@ -3,9 +3,9 @@ import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
 import { initialize, LEADERBOARD_END } from 'common/utils';
+import { ChallengeService } from 'modules/challenge/challenge.service';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { Participant } from 'modules/participant/participant.payload';
-import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
 import { TeamEntity } from 'modules/team/team.entity';
 import { Team } from 'modules/team/team.payload';
 import { TeamRepository } from 'modules/team/team.repository';
@@ -17,9 +17,9 @@ export class TasksService {
 
   constructor(
     @InjectConnection() private readonly connection: Connection,
+    private readonly challengeService: ChallengeService,
     private readonly teamRepository: TeamRepository,
     private readonly schedulerRegistry: SchedulerRegistry,
-    private readonly stackoverflowService: StackoverflowService,
   ) {}
 
   validateIfCronJobFinished = (): boolean =>
@@ -50,14 +50,14 @@ export class TasksService {
     const { participants, teams } = initialize(participantList, teamList);
 
     try {
-      const answerList = await this.stackoverflowService.getAnswerList(
+      const answerList = await this.challengeService.getAnswerList(
         participantList,
       );
-      const questionList = this.stackoverflowService.getAnsweredQuestions(
+      const questionList = this.challengeService.getAnsweredQuestions(
         participants,
         answerList,
       );
-      await this.stackoverflowService.validateAnsweredQuestions(
+      await this.challengeService.validateAnsweredQuestions(
         questionList,
         participants,
         teams,

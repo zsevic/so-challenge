@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { connectionProviderMock } from 'common/mocks';
+import { ChallengeRepository } from 'modules/challenge/challenge.repository';
+import { ChallengeService } from 'modules/challenge/challenge.service';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
-import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
-import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
 
@@ -17,10 +17,10 @@ describe('TeamService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        ChallengeRepository,
+        ChallengeService,
         connectionProviderMock,
         ParticipantRepository,
-        StackoverflowRepository,
-        StackoverflowService,
         TeamRepository,
         TeamService,
       ],

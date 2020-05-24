@@ -2,34 +2,32 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { connectionProviderMock } from 'common/mocks';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
-import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
-import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
+import { ChallengeRepository } from 'modules/challenge/challenge.repository';
+import { ChallengeService } from 'modules/challenge/challenge.service';
 import { TeamController } from './team.controller';
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
 
 describe('Team Controller', () => {
   let controller: TeamController;
-  let stackoverflowService: StackoverflowService;
+  let challengeService: ChallengeService;
   let teamService: TeamService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeamController],
       providers: [
+        ChallengeRepository,
+        ChallengeService,
         connectionProviderMock,
         ParticipantRepository,
-        StackoverflowRepository,
-        StackoverflowService,
         TeamRepository,
         TeamService,
       ],
     }).compile();
 
     controller = module.get<TeamController>(TeamController);
-    stackoverflowService = module.get<StackoverflowService>(
-      StackoverflowService,
-    );
+    challengeService = module.get<ChallengeService>(ChallengeService);
     teamService = module.get<TeamService>(TeamService);
   });
 
@@ -71,9 +69,9 @@ describe('Team Controller', () => {
       score,
     };
     jest
-      .spyOn(stackoverflowService, 'validateIfRegistrationEnded')
+      .spyOn(challengeService, 'validateIfRegistrationEnded')
       .mockReturnValue(false);
-    jest.spyOn(stackoverflowService, 'validateTeam').mockResolvedValue();
+    jest.spyOn(challengeService, 'validateTeam').mockResolvedValue();
     jest.spyOn(teamService, 'createTeam').mockResolvedValue(createdTeam);
 
     expect(await controller.registerTeam(team)).toBe(createdTeam);

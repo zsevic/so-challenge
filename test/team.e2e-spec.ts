@@ -26,4 +26,29 @@ describe('AppController (e2e)', () => {
       .get('/teams')
       .expect(HttpStatus.OK);
   });
+
+  it('/teams (POST)', () => {
+    const team = {
+      name: 'team1',
+      members: [
+        {
+          name: 'Andy LifeBrixx',
+          stackoverflow_id: 335384,
+        },
+        {
+          name: 'user235254',
+          stackoverflow_id: 235254,
+        },
+        {
+          name: 'user235384',
+          stackoverflow_id: 235384,
+        },
+      ],
+    };
+
+    return request(app.getHttpServer())
+      .post('/teams')
+      .send(team)
+      .expect(HttpStatus.CREATED);
+  });
 });

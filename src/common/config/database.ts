@@ -9,16 +9,27 @@ const options = {
   synchronize: false,
 };
 
-export default registerAs('database', () =>
-  process.env.NODE_ENV === 'production'
-    ? {
-        ...options,
-        type: 'postgres',
-        url: process.env.DATABASE_URL,
-      }
-    : {
-        ...options,
-        database: 'database.sqlite',
-        type: 'sqlite',
-      },
-);
+export default registerAs('database', () => {
+  const environmentsConfig = {
+    production: {
+      ...options,
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+    },
+    test: {
+      ...options,
+      database: 'test.sqlite',
+      dropSchema: true,
+      synchronize: true,
+      type: 'sqlite',
+    },
+    development: {
+      ...options,
+      database: 'database.sqlite',
+      type: 'sqlite',
+    },
+  };
+  const currentEnvironment = process.env.NODE_ENV || 'development';
+
+  return environmentsConfig[currentEnvironment];
+});

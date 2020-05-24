@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
 const options = {
-  entities: ['dist/**/**.entity{.ts,.js}'],
+  entities: [__dirname + '/../../../**/*.entity.{js,ts}'],
   keepConnectionAlive: true,
   logging: false,
   migrations: ['dist/database/migrations/*{.ts,.js}'],

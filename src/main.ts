@@ -25,8 +25,8 @@ async function bootstrap(): Promise<void> {
   app.enable('trust proxy'); // used for rate limiter
   app.enableShutdownHooks();
   app.get(AppModule).subscribeToShutdown(() => app.close());
-  app.setBaseViewsDir(join(__dirname, '../..', 'views'));
-  setupTemplateEngine(__dirname);
+  app.setBaseViewsDir(join(process.cwd(), 'views'));
+  setupTemplateEngine();
   app.setViewEngine('hbs');
   app.use(compression());
   app.use(cookieParser());

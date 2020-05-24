@@ -1,6 +1,12 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
 import {
+  ANSWERS_START_YEAR,
+  ANSWERS_START_MONTH,
+  ANSWERS_START_DAY,
+  ANSWER_END_YEAR,
+  ANSWER_END_MONTH,
+  ANSWER_END_DAY,
   ANSWERS_END_TIMESTAMP,
   ANSWERS_START_TIMESTAMP,
   QUESTIONS_BATCH_SIZE,
@@ -16,15 +22,9 @@ import {
   QUESTION_TAGS,
   USERS_BATCH_SIZE,
   USERS_PAGE_SIZE,
-  ANSWERS_START_YEAR,
-  ANSWERS_START_MONTH,
-  ANSWERS_START_DAY,
-  ANSWER_END_YEAR,
-  ANSWER_END_MONTH,
-  ANSWER_END_DAY,
 } from 'modules/challenge/challenge.constants';
 import { getQueryParameterDateFormat, splitBy } from 'common/utils';
-import { REGISTRATION_END } from 'modules/challenge/challenge.constants';
+import { REGISTRATION_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
@@ -95,6 +95,27 @@ export class ChallengeService {
       .map((participant: Participant): number => participant.stackoverflow_id)
       .join(';');
 
+  getQuestionList = async (
+    answeredQuestions: Record<string, any>,
+  ): Promise<any> => {
+    const answeredQuestionIds = Object.keys(answeredQuestions).map(
+      (id: string): number => +id,
+    );
+    if (answeredQuestionIds.length === 0) {
+      this.logger.log('There are no answered questions');
+      return;
+    }
+
+    const questionIdsList = splitBy(QUESTIONS_BATCH_SIZE, answeredQuestionIds);
+
+    const questions = questionIdsList
+      .map((questionsIds: number[]): string => questionsIds.join(';'))
+      .map((questionsIds: string): string => this.getQuestionsUrl(questionsIds))
+      .map((questionsUrl: string) => axios.get(questionsUrl));
+
+    return this.challengeRepository.getData(questions);
+  };
+
   getQuestionsUrl = (
     questionsIds: string,
     pagesize = QUESTIONS_PAGE_SIZE,
@@ -123,6 +144,19 @@ export class ChallengeService {
     return this.challengeRepository.getUsers(usersUrl);
   };
 
+  incrementScore = (answeredQuestion, participants, teams, question): void => {
+    const participantIds = Object.keys(answeredQuestion);
+    participantIds.forEach(participantId => {
+      const participant = participants[participantId];
+      const answer = answeredQuestion[participantId];
+
+      participant.score += answer.score;
+      participant.link = answer.owner.link;
+      teams[participant.team_id].score += answer.score;
+      this.logger.debug(`${question.title}, score: ${answer.score}`);
+    });
+  };
+
   validateAnswerCreationDate = (creationDate: number): boolean => {
     const answerCreationDate = new Date(creationDate * 1000).getTime();
     return (
@@ -149,58 +183,13 @@ export class ChallengeService {
     );
   };
 
-  validateAnsweredQuestions = async (
-    answeredQuestions: Record<string, any>,
-    participants: Record<number, Participant>,
-    teams: Record<number, Team>,
-  ): Promise<void> => {
-    const answeredQuestionsIds = Object.keys(answeredQuestions).map(
-      (id: string): number => +id,
-    );
-    if (answeredQuestionsIds.length === 0) {
-      this.logger.log('There are no answered questions');
-      return;
-    }
-
-    const questionsIdsList = splitBy(
-      QUESTIONS_BATCH_SIZE,
-      answeredQuestionsIds,
-    );
-    const questions = questionsIdsList
-      .map((questionsIds: number[]): string => questionsIds.join(';'))
-      .map((questionsIds: string): string => this.getQuestionsUrl(questionsIds))
-      .map((questionsUrl: string) => axios.get(questionsUrl));
-
-    const questionList = await this.challengeRepository.getData(questions);
-    questionList.forEach(question => {
-      const participantIds = Object.keys(participants).map(
-        (participant: string): number => +participant,
-      );
-      const answeredQuestion = answeredQuestions[question.question_id];
-      const isValidQuestion = this.validateQuestion(question, participantIds);
-
-      if (isValidQuestion) {
-        const participantIds = Object.keys(answeredQuestion);
-        participantIds.forEach(participantId => {
-          const participant = participants[participantId];
-          const answer = answeredQuestion[participantId];
-
-          participant.score += answer.score;
-          participant.link = answer.owner.link;
-          teams[participant.team_id].score += answer.score;
-          this.logger.debug(`${question.title}, score: ${answer.score}`);
-        });
-      }
-    });
-  };
-
   validateEditedAnswer = (lastEditDate: number): boolean => {
     const answerLastEditDate = new Date(lastEditDate * 1000).getTime();
     return answerLastEditDate <= ANSWERS_END_TIMESTAMP;
   };
 
   validateIfRegistrationEnded = (): boolean =>
-    REGISTRATION_END <= new Date().getTime();
+    REGISTRATION_END_TIMESTAMP <= new Date().getTime();
 
   validateParticipantName = (
     participantName: string,

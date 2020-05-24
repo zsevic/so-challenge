@@ -3,7 +3,7 @@ import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
 import { initialize } from 'common/utils';
-import { LEADERBOARD_END } from 'modules/challenge/challenge.constants';
+import { LEADERBOARD_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { Participant } from 'modules/participant/participant.payload';
@@ -24,7 +24,7 @@ export class TasksService {
   ) {}
 
   validateIfCronJobFinished = (): boolean =>
-    LEADERBOARD_END <= new Date().getTime();
+    LEADERBOARD_END_TIMESTAMP <= new Date().getTime();
 
   @Cron(CronExpression.EVERY_2ND_HOUR, {
     name: CRON_JOB_NAME,
@@ -54,15 +54,33 @@ export class TasksService {
       const answerList = await this.challengeService.getAnswerList(
         participantList,
       );
-      const questionList = this.challengeService.getAnsweredQuestions(
+      const answeredQuestions = this.challengeService.getAnsweredQuestions(
         participants,
         answerList,
       );
-      await this.challengeService.validateAnsweredQuestions(
-        questionList,
-        participants,
-        teams,
+      const questionList = await this.challengeService.getQuestionList(
+        answeredQuestions,
       );
+
+      questionList.forEach(question => {
+        const participantIds = Object.keys(participants).map(
+          (id: string): number => +id,
+        );
+        const isValidQuestion = this.challengeService.validateQuestion(
+          question,
+          participantIds,
+        );
+
+        if (isValidQuestion) {
+          const answeredQuestion = answeredQuestions[question.question_id];
+          this.challengeService.incrementScore(
+            answeredQuestion,
+            participants,
+            teams,
+            question,
+          );
+        }
+      });
 
       await this.connection.transaction(
         async (manager: EntityManager): Promise<void> => {

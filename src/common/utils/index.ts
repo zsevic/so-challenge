@@ -42,9 +42,6 @@ export const REGISTRATION_END = new Date(
 export const isCronJobFinished = (): boolean =>
   LEADERBOARD_END <= new Date().getTime();
 
-export const isRegistrationEnded = (): boolean =>
-  REGISTRATION_END <= new Date().getTime();
-
 type Init = {
   participants: Record<number, Participant>;
   teams: Record<number, Team>;

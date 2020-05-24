@@ -23,7 +23,11 @@ import {
   ANSWER_END_MONTH,
   ANSWER_END_DAY,
 } from 'common/config/constants';
-import { splitBy, getQueryParameterDateFormat } from 'common/utils';
+import {
+  getQueryParameterDateFormat,
+  REGISTRATION_END,
+  splitBy,
+} from 'common/utils';
 import { Participant } from 'modules/participant/participant.payload';
 import { StackoverflowRepository } from 'modules/stackoverflow/stackoverflow.repository';
 import { Team } from 'modules/team/team.payload';
@@ -205,6 +209,9 @@ export class StackoverflowService {
     return answerLastEditDate <= ANSWERS_END_TIMESTAMP;
   };
 
+  validateIfRegistrationEnded = (): boolean =>
+    REGISTRATION_END <= new Date().getTime();
+
   validateParticipantName = (
     participantName: string,
     answerOwnerName: string,
@@ -237,6 +244,11 @@ export class StackoverflowService {
     questionOwnerId: number,
     participantIds: number[],
   ): boolean => !participantIds.includes(questionOwnerId);
+
+  async validateTeam(team: Team): Promise<void> {
+    const teamMembers = await this.getUsers(team);
+    await this.validateTeamMembers(teamMembers, team.members);
+  }
 
   validateTeamMembers = (users: any, teamMembers: Participant[]): void => {
     if (users.length !== teamMembers.length) {

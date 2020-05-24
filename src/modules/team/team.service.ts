@@ -43,12 +43,4 @@ export class TeamService {
   async getTeamList(): Promise<Team[]> {
     return this.teamRepository.getTeamList();
   }
-
-  async validateTeam(team: Team): Promise<void> {
-    const teamMembers = await this.stackoverflowService.getUsers(team);
-    await this.stackoverflowService.validateTeamMembers(
-      teamMembers,
-      team.members,
-    );
-  }
 }

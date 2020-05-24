@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -23,6 +24,6 @@ describe('AppController (e2e)', () => {
   it('/teams (GET)', () => {
     return request(app.getHttpServer())
       .get('/teams')
-      .expect(200);
+      .expect(HttpStatus.OK);
   });
 });

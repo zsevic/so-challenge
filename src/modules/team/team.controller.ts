@@ -9,13 +9,9 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
-import {
-  getEnd,
-  isRegistrationEnded,
-  LEADERBOARD_END,
-  REGISTRATION_END,
-} from 'common/utils';
+import { getEnd, LEADERBOARD_END, REGISTRATION_END } from 'common/utils';
 import { Participant } from 'modules/participant/participant.payload';
+import { StackoverflowService } from 'modules/stackoverflow/stackoverflow.service';
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
@@ -23,7 +19,10 @@ import { TeamService } from './team.service';
 @Controller()
 @ApiTags('teams')
 export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(
+    private readonly stackoverflowService: StackoverflowService,
+    private readonly teamService: TeamService,
+  ) {}
 
   @Get('leaderboard')
   async leaderboard(@Res() res: Response) {
@@ -81,7 +80,8 @@ export class TeamController {
       title: 'SO challenge - Registration',
       page: 'registration',
     };
-    if (isRegistrationEnded()) {
+    const isRegistrationEnded = this.stackoverflowService.validateIfRegistrationEnded();
+    if (isRegistrationEnded) {
       return res.render('registration-ended', data);
     }
     const registrationEnd = getEnd(REGISTRATION_END);
@@ -94,10 +94,11 @@ export class TeamController {
 
   @Post('teams')
   async registerTeam(@Body() teamDto: CreateTeamDto): Promise<Team> {
-    if (isRegistrationEnded()) {
+    const isRegistrationEnded = this.stackoverflowService.validateIfRegistrationEnded();
+    if (isRegistrationEnded) {
       throw new BadRequestException('Registration is ended');
     }
-    await this.teamService.validateTeam(teamDto);
+    await this.stackoverflowService.validateTeam(teamDto);
 
     return this.teamService.createTeam(teamDto);
   }

@@ -2,14 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { initialize } from 'common/utils';
 import { LEADERBOARD_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
-import { Participant } from 'modules/participant/participant.payload';
 import { TeamEntity } from 'modules/team/team.entity';
-import { Team } from 'modules/team/team.payload';
-import { TeamRepository } from 'modules/team/team.repository';
+import { TeamService } from 'modules/team/team.service';
 import { CRON_JOB_NAME, INTERVAL } from './tasks.constants';
 
 @Injectable()
@@ -19,7 +16,7 @@ export class TasksService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly challengeService: ChallengeService,
-    private readonly teamRepository: TeamRepository,
+    private readonly teamService: TeamService,
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
@@ -43,16 +40,16 @@ export class TasksService {
     }
 
     this.logger.debug(`Called every ${INTERVAL} minute(s)`);
-    const teamList = await this.teamRepository.getTeamList();
-    const participantList = teamList
-      .map((team: Team): Participant[] => team.members)
-      .reduce((acc, current) => acc.concat(current), []);
-
-    const { participants, teams } = initialize(participantList, teamList);
+    const {
+      participants,
+      participantList,
+      teams,
+      teamList,
+    } = await this.teamService.getInitData();
 
     try {
       const answerList = await this.challengeService.getAnswerList(
-        participantList,
+        participants,
       );
       const answeredQuestions = this.challengeService.getAnsweredQuestions(
         participants,

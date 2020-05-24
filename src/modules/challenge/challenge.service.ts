@@ -58,9 +58,11 @@ export class ChallengeService {
     return answeredQuestions;
   };
 
-  getAnswerList = async (participantList: Participant[]): Promise<any> => {
-    const participantIds = participantList.map(
-      (participant: Participant): number => participant.stackoverflow_id,
+  getAnswerList = async (
+    participants: Record<string, Participant>,
+  ): Promise<any> => {
+    const participantIds = Object.keys(participants).map(
+      (id: string): number => +id,
     );
     const participantIdsList = splitBy(USERS_BATCH_SIZE, participantIds);
     const answers = participantIdsList

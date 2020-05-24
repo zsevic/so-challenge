@@ -6,6 +6,7 @@ import { ParticipantRepository } from 'modules/participant/participant.repositor
 import { CreateTeamDto } from './dto';
 import { Team } from './team.payload';
 import { TeamRepository } from './team.repository';
+import { InitData } from './team.types';
 
 @Injectable()
 export class TeamService {
@@ -37,6 +38,30 @@ export class TeamService {
       };
     });
   }
+
+  getInitData = async (): Promise<InitData> => {
+    const teamList = await this.getTeamList();
+    const participantList = teamList
+      .map((team: Team): Participant[] => team.members)
+      .reduce((acc, current): Participant[] => acc.concat(current), []);
+
+    const teams = {};
+    teamList.forEach((team: Team): void => {
+      const id = team.id;
+      teams[id] = team;
+      teams[id].score = 0;
+    });
+
+    const participants = {};
+    participantList.forEach((participant: Participant): void => {
+      const id = +participant.stackoverflow_id;
+      participants[id] = participant;
+      participants[id].score = 0;
+      participants[id].stackoverflow_id = +participant.stackoverflow_id;
+    });
+
+    return { participants, participantList, teams, teamList };
+  };
 
   async getTeamList(): Promise<Team[]> {
     return this.teamRepository.getTeamList();

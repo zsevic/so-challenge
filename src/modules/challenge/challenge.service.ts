@@ -211,9 +211,7 @@ export class ChallengeService {
   ): boolean => participantName.localeCompare(answerOwnerName) === 0;
 
   validateQuestion = (question: any, participantIds: number[]): boolean => {
-    const containsValidTag = this.validateIfQuestionContainsValidTag(
-      question.tags,
-    );
+    const containsValidTag = this.validateQuestionTags(question.tags);
 
     const isValidQuestionOwner = this.validateQuestionOwner(
       question.owner.user_id,
@@ -240,7 +238,7 @@ export class ChallengeService {
     participantIds: number[],
   ): boolean => !participantIds.includes(questionOwnerId);
 
-  validateIfQuestionContainsValidTag = (tags: string[]): boolean =>
+  validateQuestionTags = (tags: string[]): boolean =>
     tags.some((tag: string): boolean => QUESTION_TAGS.includes(tag)) ||
     QUESTION_TAGS.length === 0;
 

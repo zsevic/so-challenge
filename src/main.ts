@@ -9,7 +9,7 @@ import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
 import { setupApiDocs } from 'common/config/api-docs';
 import { RATE_LIMIT_REQUESTS, RATE_LIMIT_TIME } from 'common/config/rate-limit';
-import { setupTemplateEngine } from 'common/config/template-engine';
+import { templateEngineConfig } from 'common/config/template-engine';
 import { AllExceptionsFilter } from 'common/filters';
 import { loggerMiddleware } from 'common/middlewares';
 import { CustomValidationPipe } from 'common/pipes';
@@ -25,9 +25,10 @@ async function bootstrap(): Promise<void> {
   app.enable('trust proxy'); // used for rate limiter
   app.enableShutdownHooks();
   app.get(AppModule).subscribeToShutdown(() => app.close());
-  app.setBaseViewsDir(join(process.cwd(), 'views'));
-  setupTemplateEngine();
+
+  app.engine('hbs', templateEngineConfig);
   app.setViewEngine('hbs');
+
   app.use(compression());
   app.use(cookieParser());
   app.use(helmet());

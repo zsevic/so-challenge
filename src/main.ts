@@ -46,7 +46,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
     }),
   );
-  app.useStaticAssets(join(__dirname, '../..', 'public'));
+  app.useStaticAssets(join(process.cwd(), 'public'));
   setupApiDocs(app);
   if (isProdEnv) {
     Sentry.init({ dsn: configService.get('SENTRY_DSN') });

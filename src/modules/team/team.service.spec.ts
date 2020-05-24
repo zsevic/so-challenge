@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getConnectionToken } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
 import { connectionProviderMock } from 'common/mocks';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
@@ -10,6 +12,7 @@ import { TeamService } from './team.service';
 describe('TeamService', () => {
   let service: TeamService;
   let repository: TeamRepository;
+  let connection: Connection;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +28,7 @@ describe('TeamService', () => {
 
     service = module.get<TeamService>(TeamService);
     repository = module.get<TeamRepository>(TeamRepository);
+    connection = module.get<Connection>(getConnectionToken());
   });
 
   it('should create a team', async () => {
@@ -64,6 +68,7 @@ describe('TeamService', () => {
       ),
       score,
     };
+    jest.spyOn(connection, 'transaction').mockResolvedValue(createdTeam);
 
     expect(await service.createTeam(team)).toMatchObject(createdTeam);
   });

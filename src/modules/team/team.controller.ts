@@ -9,7 +9,11 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
-import { getEnd, LEADERBOARD_END, REGISTRATION_END } from 'common/utils';
+import { getEnd } from 'common/utils';
+import {
+  LEADERBOARD_END,
+  REGISTRATION_END,
+} from 'modules/challenge/challenge.constants';
 import { Participant } from 'modules/participant/participant.payload';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { CreateTeamDto } from './dto';

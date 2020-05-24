@@ -23,11 +23,8 @@ import {
   ANSWER_END_MONTH,
   ANSWER_END_DAY,
 } from 'modules/challenge/challenge.constants';
-import {
-  getQueryParameterDateFormat,
-  REGISTRATION_END,
-  splitBy,
-} from 'common/utils';
+import { getQueryParameterDateFormat, splitBy } from 'common/utils';
+import { REGISTRATION_END } from 'modules/challenge/challenge.constants';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';

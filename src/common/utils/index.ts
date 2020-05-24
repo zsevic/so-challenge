@@ -1,16 +1,4 @@
 import { formatDistanceToNow } from 'date-fns';
-import {
-  LEADERBOARD_END_YEAR,
-  LEADERBOARD_END_MONTH,
-  LEADERBOARD_END_DAY,
-  LEADERBOARD_END_HOURS,
-  LEADERBOARD_END_MINUTES,
-  REGISTRATION_END_YEAR,
-  REGISTRATION_END_MONTH,
-  REGISTRATION_END_DAY,
-  REGISTRATION_END_HOURS,
-  REGISTRATION_END_MINUTES,
-} from 'modules/challenge/challenge.constants';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
 
@@ -22,22 +10,6 @@ export function getQueryParameterDateFormat(
   const monthValue = month < 9 ? `0${month + 1}` : month + 1;
   return `${year}-${monthValue}-${day}`;
 }
-
-export const LEADERBOARD_END = new Date(
-  LEADERBOARD_END_YEAR,
-  LEADERBOARD_END_MONTH,
-  LEADERBOARD_END_DAY,
-  LEADERBOARD_END_HOURS,
-  LEADERBOARD_END_MINUTES,
-).getTime();
-
-export const REGISTRATION_END = new Date(
-  REGISTRATION_END_YEAR,
-  REGISTRATION_END_MONTH,
-  REGISTRATION_END_DAY,
-  REGISTRATION_END_HOURS,
-  REGISTRATION_END_MINUTES,
-).getTime();
 
 type Init = {
   participants: Record<number, Participant>;

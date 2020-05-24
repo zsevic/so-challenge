@@ -38,24 +38,24 @@ describe('Team Controller', () => {
       name: 'team1',
       members: [
         {
-          name: 'member1',
-          stackoverflow_id: 1234,
+          name: 'Andy LifeBrixx',
+          stackoverflow_id: 335384,
         },
         {
-          name: 'member2',
-          stackoverflow_id: 2345,
+          name: 'user235254',
+          stackoverflow_id: 235254,
         },
         {
-          name: 'member3',
-          stackoverflow_id: 3456,
+          name: 'user235384',
+          stackoverflow_id: 235384,
         },
       ],
     };
-    const teamId = '913e59c4-a249-4cd3-9c08-6cd75386c773';
+    const teamId = '370b670e-6d78-44de-be26-3d3af4d02faf';
     const participantIds = [
-      '6c220bf1-d78e-42bd-a1f6-e7aa704a7072',
-      'f4872df9-293d-4342-9bea-dff5815e6eed',
-      'ff233562-fc3c-45e2-9f90-688143de8c58',
+      'c51555dd-4e44-4259-a89a-f5f82b4b599e',
+      '55be4f25-36d0-447b-8e3e-c297ac647026',
+      '613dd7e4-50a1-4f27-a0a7-f572ac27e268',
     ];
     const score = 0;
     const createdTeam = {
@@ -77,5 +77,52 @@ describe('Team Controller', () => {
     jest.spyOn(teamService, 'createTeam').mockResolvedValue(createdTeam);
 
     expect(await controller.registerTeam(team)).toBe(createdTeam);
+  });
+
+  it('should return an array of teams', async () => {
+    const teamList = [
+      {
+        id: '370b670e-6d78-44de-be26-3d3af4d02faf',
+        name: 'team1',
+        score: 1,
+        created_at: '2020-05-20T22:25:22.000Z',
+        updated_at: '2020-05-21T00:48:11.000Z',
+        members: [
+          {
+            id: 'c51555dd-4e44-4259-a89a-f5f82b4b599e',
+            stackoverflow_id: 335384,
+            team_id: '370b670e-6d78-44de-be26-3d3af4d02faf',
+            link: '',
+            name: 'Andy LifeBrixx',
+            score: 0,
+            created_at: '2020-05-20T22:25:22.000Z',
+            updated_at: '2020-05-20T22:25:22.000Z',
+          },
+          {
+            id: '55be4f25-36d0-447b-8e3e-c297ac647026',
+            stackoverflow_id: 235254,
+            team_id: '370b670e-6d78-44de-be26-3d3af4d02faf',
+            link: '',
+            name: 'user235254',
+            score: 0,
+            created_at: '2020-05-20T22:25:22.000Z',
+            updated_at: '2020-05-20T22:25:22.000Z',
+          },
+          {
+            id: '613dd7e4-50a1-4f27-a0a7-f572ac27e268',
+            stackoverflow_id: 235384,
+            team_id: '370b670e-6d78-44de-be26-3d3af4d02faf',
+            link: '',
+            name: 'user235384',
+            score: 0,
+            created_at: '2020-05-20T22:25:22.000Z',
+            updated_at: '2020-05-20T22:25:22.000Z',
+          },
+        ],
+      },
+    ];
+    jest.spyOn(teamService, 'getTeamList').mockResolvedValue(teamList);
+
+    expect(await teamService.getTeamList()).toStrictEqual(teamList);
   });
 });

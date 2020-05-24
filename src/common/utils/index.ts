@@ -36,14 +36,14 @@ export const initialize = (
   return { participants, teams };
 };
 
-const getPrefix = (date: number): string =>
+const getEndPrefix = (date: number): string =>
   date <= new Date().getTime() ? 'ended' : 'ends';
 
 export const getEnd = (endDate: number): string => {
   const distance = formatDistanceToNow(endDate, {
     addSuffix: true,
   });
-  const prefix = getPrefix(endDate);
+  const prefix = getEndPrefix(endDate);
 
   return `${prefix} ${distance}`;
 };

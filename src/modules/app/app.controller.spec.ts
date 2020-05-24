@@ -13,7 +13,7 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should be defined', () => {
+    it('should return object with page title', () => {
       expect(controller.root()).toMatchObject({ title: 'SO challenge' });
     });
   });

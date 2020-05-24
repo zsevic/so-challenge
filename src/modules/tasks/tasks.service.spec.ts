@@ -3,7 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { connectionProviderMock } from 'common/mocks';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { ChallengeService } from 'modules/challenge/challenge.service';
+import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { TeamRepository } from 'modules/team/team.repository';
+import { TeamService } from 'modules/team/team.service';
 import { TasksService } from './tasks.service';
 
 describe('TasksService', () => {
@@ -15,9 +17,11 @@ describe('TasksService', () => {
         ChallengeRepository,
         ChallengeService,
         connectionProviderMock,
+        ParticipantRepository,
         SchedulerRegistry,
         TasksService,
         TeamRepository,
+        TeamService,
       ],
     }).compile();
 

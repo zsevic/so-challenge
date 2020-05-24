@@ -74,7 +74,7 @@ describe('Team Controller', () => {
     jest.spyOn(challengeService, 'validateTeam').mockResolvedValue();
     jest.spyOn(teamService, 'createTeam').mockResolvedValue(createdTeam);
 
-    expect(await controller.registerTeam(team)).toBe(createdTeam);
+    expect(await controller.registerTeam(team)).toMatchObject(createdTeam);
   });
 
   it('should return an array of teams', async () => {
@@ -121,6 +121,6 @@ describe('Team Controller', () => {
     ];
     jest.spyOn(teamService, 'getTeamList').mockResolvedValue(teamList);
 
-    expect(await teamService.getTeamList()).toStrictEqual(teamList);
+    expect(await teamService.getTeamList()).toMatchObject(teamList);
   });
 });

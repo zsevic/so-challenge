@@ -14,7 +14,7 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should be defined', () => {
-      expect(controller).toBeDefined();
+      expect(controller.root()).toMatchObject({ title: 'SO challenge' });
     });
   });
 });

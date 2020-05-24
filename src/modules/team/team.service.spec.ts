@@ -117,6 +117,6 @@ describe('TeamService', () => {
     ];
     jest.spyOn(repository, 'getTeamList').mockResolvedValue(teamList);
 
-    expect(await service.getTeamList()).toStrictEqual(teamList);
+    expect(await service.getTeamList()).toMatchObject(teamList);
   });
 });

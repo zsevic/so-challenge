@@ -11,7 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
 import { getEnd } from 'common/utils';
 import {
-  LEADERBOARD_END_TIMESTAMP,
+  LEADERBOARD_UPDATING_END_TIMESTAMP,
   REGISTRATION_END_TIMESTAMP,
 } from 'modules/challenge/challenge.constants';
 import { Participant } from 'modules/participant/participant.payload';
@@ -63,13 +63,13 @@ export class TeamController {
               ),
             }),
           );
-    const leaderboardEnd = getEnd(LEADERBOARD_END_TIMESTAMP);
+    const leaderboardUpdatingEnd = getEnd(LEADERBOARD_UPDATING_END_TIMESTAMP);
 
     return res.render('leaderboard', {
       ...data,
       teamList,
       lastUpdate,
-      leaderboardEnd,
+      leaderboardUpdatingEnd,
     });
   }
 

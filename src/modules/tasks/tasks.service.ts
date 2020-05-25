@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntityManager } from 'typeorm';
-import { LEADERBOARD_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
+import { LEADERBOARD_UPDATING_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { ParticipantEntity } from 'modules/participant/participant.entity';
 import { TeamEntity } from 'modules/team/team.entity';
@@ -21,7 +21,7 @@ export class TasksService {
   ) {}
 
   validateIfCronJobFinished = (): boolean =>
-    LEADERBOARD_END_TIMESTAMP <= new Date().getTime();
+    LEADERBOARD_UPDATING_END_TIMESTAMP <= new Date().getTime();
 
   @Cron(CronExpression.EVERY_2ND_HOUR, {
     name: CRON_JOB_NAME,

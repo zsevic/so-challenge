@@ -1,14 +1,14 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
 import {
-  ANSWERS_START_YEAR,
-  ANSWERS_START_MONTH,
-  ANSWERS_START_DAY,
-  ANSWER_END_YEAR,
-  ANSWER_END_MONTH,
-  ANSWER_END_DAY,
-  ANSWERS_END_TIMESTAMP,
-  ANSWERS_START_TIMESTAMP,
+  CHALLENGE_START_YEAR,
+  CHALLENGE_START_MONTH,
+  CHALLENGE_START_DAY,
+  CHALLENGE_END_YEAR,
+  CHALLENGE_END_MONTH,
+  CHALLENGE_END_DAY,
+  CHALLENGE_END_TIMESTAMP,
+  CHALLENGE_START_TIMESTAMP,
   QUESTIONS_BATCH_SIZE,
   QUESTIONS_END_TIMESTAMP,
   QUESTIONS_START_TIMESTAMP,
@@ -79,14 +79,14 @@ export class ChallengeService {
     page = 1,
   ): string => {
     const ANSWERS_FROM_DATE = getQueryParameterDateFormat(
-      ANSWERS_START_YEAR,
-      ANSWERS_START_MONTH,
-      ANSWERS_START_DAY,
+      CHALLENGE_START_YEAR,
+      CHALLENGE_START_MONTH,
+      CHALLENGE_START_DAY,
     );
     const ANSWERS_TO_DATE = getQueryParameterDateFormat(
-      ANSWER_END_YEAR,
-      ANSWER_END_MONTH,
-      ANSWER_END_DAY,
+      CHALLENGE_END_YEAR,
+      CHALLENGE_END_MONTH,
+      CHALLENGE_END_DAY,
     );
 
     return `https://api.stackexchange.com/2.2/users/${usersIds}/answers?site=stackoverflow&fromdate=${ANSWERS_FROM_DATE}&todate=${ANSWERS_TO_DATE}&page=${page}&pagesize=${pagesize}`;
@@ -162,8 +162,8 @@ export class ChallengeService {
   validateAnswerCreationDate = (creationDate: number): boolean => {
     const answerCreationDate = new Date(creationDate * 1000).getTime();
     return (
-      ANSWERS_START_TIMESTAMP <= answerCreationDate &&
-      answerCreationDate <= ANSWERS_END_TIMESTAMP
+      CHALLENGE_START_TIMESTAMP <= answerCreationDate &&
+      answerCreationDate <= CHALLENGE_END_TIMESTAMP
     );
   };
 
@@ -187,7 +187,7 @@ export class ChallengeService {
 
   validateEditedAnswer = (lastEditDate: number): boolean => {
     const answerLastEditDate = new Date(lastEditDate * 1000).getTime();
-    return answerLastEditDate <= ANSWERS_END_TIMESTAMP;
+    return answerLastEditDate <= CHALLENGE_END_TIMESTAMP;
   };
 
   validateIfRegistrationEnded = (): boolean =>

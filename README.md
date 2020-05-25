@@ -2,6 +2,8 @@
 
 > Stackoverflow challenge registration and leaderboard
 
+See demo: [http://so-challenge.herokuapp.com](http://so-challenge.herokuapp.com)
+
 ## Getting started
 
 ### Setup

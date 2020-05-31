@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { EntityManager, EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 import { ParticipantEntity } from './participant.entity';
 import { Participant } from './participant.payload';
 
@@ -8,10 +8,8 @@ import { Participant } from './participant.payload';
 export class ParticipantRepository extends Repository<ParticipantEntity> {
   async bulkCreateParticipants(
     participantList: Participant[],
-    manager: EntityManager,
   ): Promise<Participant[]> {
-    const participants = await manager
-      .createQueryBuilder(ParticipantEntity, 'participant')
+    const participants = await this.createQueryBuilder('participant')
       .insert()
       .into(ParticipantEntity)
       .values(participantList)

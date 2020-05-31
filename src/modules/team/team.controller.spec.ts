@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { connectionProviderMock } from 'common/mocks';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
@@ -19,7 +18,6 @@ describe('Team Controller', () => {
       providers: [
         ChallengeRepository,
         ChallengeService,
-        connectionProviderMock,
         ParticipantRepository,
         TeamRepository,
         TeamService,

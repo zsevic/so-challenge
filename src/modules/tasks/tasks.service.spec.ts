@@ -1,6 +1,5 @@
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Test, TestingModule } from '@nestjs/testing';
-import { connectionProviderMock } from 'common/mocks';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
@@ -16,7 +15,6 @@ describe('TasksService', () => {
       providers: [
         ChallengeRepository,
         ChallengeService,
-        connectionProviderMock,
         ParticipantRepository,
         SchedulerRegistry,
         TasksService,

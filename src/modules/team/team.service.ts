@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
-import { Connection, EntityManager } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { CreateTeamDto } from './dto';
@@ -11,32 +10,29 @@ import { InitData } from './team.types';
 @Injectable()
 export class TeamService {
   constructor(
-    @InjectConnection() private readonly connection: Connection,
     private readonly participantRepository: ParticipantRepository,
     private readonly teamRepository: TeamRepository,
   ) {}
 
+  @Transactional()
   async createTeam(teamDto: CreateTeamDto): Promise<Team> {
-    return this.connection.transaction(async (manager: EntityManager) => {
-      const team = await this.teamRepository.createTeam(teamDto.name, manager);
+    const team = await this.teamRepository.createTeam(teamDto.name);
 
-      const memberList = teamDto.members.map(
-        (participant: Participant): Participant => ({
-          ...participant,
-          team_id: team.id,
-        }),
-      );
+    const memberList = teamDto.members.map(
+      (participant: Participant): Participant => ({
+        ...participant,
+        team_id: team.id,
+      }),
+    );
 
-      const members = await this.participantRepository.bulkCreateParticipants(
-        memberList,
-        manager,
-      );
+    const members = await this.participantRepository.bulkCreateParticipants(
+      memberList,
+    );
 
-      return {
-        ...team,
-        members,
-      };
-    });
+    return {
+      ...team,
+      members,
+    };
   }
 
   getInitData = async (): Promise<InitData> => {

@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { connectionProviderMock } from 'common/mocks';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { Participant } from 'modules/participant/participant.payload';
@@ -19,7 +18,6 @@ describe('TeamService', () => {
       providers: [
         ChallengeRepository,
         ChallengeService,
-        connectionProviderMock,
         ParticipantRepository,
         TeamRepository,
         TeamService,

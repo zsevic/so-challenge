@@ -9,6 +9,10 @@ import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectConnection, TypeOrmModule } from '@nestjs/typeorm';
 import { Subject } from 'rxjs';
 import { Connection } from 'typeorm';
+import {
+  initializeTransactionalContext,
+  patchTypeORMRepositoryWithBaseRepository,
+} from 'typeorm-transactional-cls-hooked';
 import config from 'common/config';
 import databaseConfig from 'common/config/database';
 import { CRON_JOB_NAME } from 'modules/tasks/tasks.constants';
@@ -24,8 +28,11 @@ const typeOrmConfig = {
     }),
   ],
   inject: [ConfigService],
-  useFactory: async (configService: ConfigService) =>
-    configService.get('database'),
+  useFactory: async (configService: ConfigService) => {
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
+    return configService.get('database');
+  },
 };
 
 @Module({

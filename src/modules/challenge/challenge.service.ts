@@ -28,11 +28,18 @@ import { REGISTRATION_END_TIMESTAMP } from 'modules/challenge/challenge.constant
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { Participant } from 'modules/participant/participant.payload';
 import { Team } from 'modules/team/team.payload';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { ParticipantRepository } from 'modules/participant/participant.repository';
+import { TeamRepository } from 'modules/team/team.repository';
 
 @Injectable()
 export class ChallengeService {
   private readonly logger = new Logger(ChallengeService.name);
-  constructor(private readonly challengeRepository: ChallengeRepository) {}
+  constructor(
+    private readonly challengeRepository: ChallengeRepository,
+    private readonly participantRepository: ParticipantRepository,
+    private readonly teamRepository: TeamRepository,
+  ) {}
 
   getAnsweredQuestions = (
     participants: Record<string, Participant>,
@@ -158,6 +165,17 @@ export class ChallengeService {
       this.logger.debug(`${question.title}, score: ${answer.score}`);
     });
   };
+
+  @Transactional()
+  async updateLeaderboard(teamList: Team[], participantList: Participant[]) {
+    await this.teamRepository
+      .save(teamList)
+      .then(() => this.logger.debug('Teams saved'));
+    await this.participantRepository
+      .save(participantList)
+      .then(() => this.logger.debug('Participants saved'));
+    this.logger.log('Leaderboard is updated');
+  }
 
   validateAnswerCreationDate = (creationDate: number): boolean => {
     const answerCreationDate = new Date(creationDate * 1000).getTime();

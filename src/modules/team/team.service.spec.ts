@@ -1,6 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getConnectionToken } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { Participant } from 'modules/participant/participant.payload';
@@ -8,10 +6,14 @@ import { ParticipantRepository } from 'modules/participant/participant.repositor
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
 
+jest.mock('typeorm-transactional-cls-hooked', () => ({
+  Transactional: () => () => ({}),
+}));
+
 describe('TeamService', () => {
+  let participantRepository: ParticipantRepository;
   let service: TeamService;
   let repository: TeamRepository;
-  let connection: Connection;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,12 +26,15 @@ describe('TeamService', () => {
       ],
     }).compile();
 
-    service = module.get<TeamService>(TeamService);
+    participantRepository = module.get<ParticipantRepository>(
+      ParticipantRepository,
+    );
     repository = module.get<TeamRepository>(TeamRepository);
-    connection = module.get<Connection>(getConnectionToken());
+    service = module.get<TeamService>(TeamService);
   });
 
   it('should create a team', async () => {
+    const score = 0;
     const team = {
       name: 'team1',
       members: [
@@ -46,6 +51,7 @@ describe('TeamService', () => {
           stackoverflow_id: 235384,
         },
       ],
+      score,
     };
     const teamId = '370b670e-6d78-44de-be26-3d3af4d02faf';
     const participantIds = [
@@ -53,7 +59,6 @@ describe('TeamService', () => {
       '55be4f25-36d0-447b-8e3e-c297ac647026',
       '613dd7e4-50a1-4f27-a0a7-f572ac27e268',
     ];
-    const score = 0;
     const createdTeam = {
       ...team,
       members: team.members.map(
@@ -64,9 +69,15 @@ describe('TeamService', () => {
           team_id: teamId,
         }),
       ),
-      score,
     };
-    jest.spyOn(connection, 'transaction').mockResolvedValue(createdTeam);
+    jest.spyOn(repository, 'createTeam').mockResolvedValue({
+      id: teamId,
+      name: team.name,
+      score,
+    });
+    jest
+      .spyOn(participantRepository, 'bulkCreateParticipants')
+      .mockResolvedValue(createdTeam.members);
 
     expect(await service.createTeam(team)).toMatchObject(createdTeam);
   });
@@ -76,7 +87,7 @@ describe('TeamService', () => {
       {
         id: '370b670e-6d78-44de-be26-3d3af4d02faf',
         name: 'team1',
-        score: 1,
+        score: 0,
         created_at: '2020-05-20T22:25:22.000Z',
         updated_at: '2020-05-21T00:48:11.000Z',
         members: [

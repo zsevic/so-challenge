@@ -7,7 +7,7 @@ export class Team {
   name: string;
 
   @Type(() => Participant)
-  members: Participant[];
+  members?: Participant[];
 
   score?: number;
 

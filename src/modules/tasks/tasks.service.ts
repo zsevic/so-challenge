@@ -1,11 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { InjectConnection } from '@nestjs/typeorm';
-import { Connection, EntityManager } from 'typeorm';
 import { LEADERBOARD_UPDATING_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
-import { ParticipantEntity } from 'modules/participant/participant.entity';
-import { TeamEntity } from 'modules/team/team.entity';
 import { TeamService } from 'modules/team/team.service';
 import { CRON_JOB_NAME, INTERVAL } from './tasks.constants';
 
@@ -14,7 +10,6 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   constructor(
-    @InjectConnection() private readonly connection: Connection,
     private readonly challengeService: ChallengeService,
     private readonly teamService: TeamService,
     private readonly schedulerRegistry: SchedulerRegistry,
@@ -79,17 +74,7 @@ export class TasksService {
         }
       });
 
-      await this.connection.transaction(
-        async (manager: EntityManager): Promise<void> => {
-          await manager
-            .save(TeamEntity, teamList)
-            .then(() => this.logger.debug('Teams saved'));
-          await manager
-            .save(ParticipantEntity, participantList)
-            .then(() => this.logger.debug('Participants saved'));
-          this.logger.log('Leaderboard is updated');
-        },
-      );
+      await this.challengeService.updateLeaderboard(teamList, participantList);
     } catch (err) {
       this.logger.error(err);
     }

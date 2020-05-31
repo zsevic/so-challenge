@@ -170,10 +170,10 @@ export class ChallengeService {
   async updateLeaderboard(teamList: Team[], participantList: Participant[]) {
     await this.teamRepository
       .save(teamList)
-      .then(() => this.logger.debug('Teams saved'));
+      .then(() => this.logger.log('Teams saved'));
     await this.participantRepository
       .save(participantList)
-      .then(() => this.logger.debug('Participants saved'));
+      .then(() => this.logger.log('Participants saved'));
     this.logger.log('Leaderboard is updated');
   }
 

@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Res,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -16,7 +17,7 @@ import {
 } from 'modules/challenge/challenge.constants';
 import { Participant } from 'modules/participant/participant.payload';
 import { ChallengeService } from 'modules/challenge/challenge.service';
-import { CreateTeamDto } from './dto';
+import { CreateTeamDto, PaginatedTeamsResultDto, PaginationDto } from './dto';
 import { Team } from './team.payload';
 import { TeamService } from './team.service';
 
@@ -29,17 +30,17 @@ export class TeamController {
   ) {}
 
   @Get('leaderboard')
-  async leaderboard(@Res() res: Response) {
+  async leaderboard(@Query() paginationDto: PaginationDto, @Res() res: Response) {
     const data = {
       title: 'SO challenge - Leaderboard',
       page: 'leaderboard',
     };
-    const teams = await this.teamService.getTeamList();
-    if (teams.length === 0) {
+    const teams = await this.teamService.getTeamList(paginationDto);
+    if (teams.data.length === 0) {
       return res.render('leaderboard-no-teams', data);
     }
 
-    const lastUpdateDate = teams
+    const lastUpdateDate = teams.data
       .map((team: Team): string => team.updated_at)
       .reduce((acc: string, current: string): string =>
         new Date(acc).getTime() < new Date(current).getTime() ? current : acc,
@@ -49,8 +50,8 @@ export class TeamController {
     });
     const teamList =
       process.env.NODE_ENV === 'development'
-        ? teams
-        : teams.map(
+        ? teams.data
+        : teams.data.map(
             (team: Team): Team => ({
               ...team,
               members: team.members.map(
@@ -74,8 +75,8 @@ export class TeamController {
   }
 
   @Get('teams')
-  async getTeamList(): Promise<Team[]> {
-    return this.teamService.getTeamList();
+  async getTeamList(@Query() paginationDto: PaginationDto): Promise<PaginatedTeamsResultDto> {
+    return this.teamService.getTeamList(paginationDto);
   }
 
   @Get('registration')

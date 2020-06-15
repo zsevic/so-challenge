@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { Participant } from 'modules/participant/participant.payload';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
-import { CreateTeamDto } from './dto';
+import { CreateTeamDto, PaginationDto, PaginatedTeamsResultDto } from './dto';
 import { Team } from './team.payload';
 import { TeamRepository } from './team.repository';
 import { InitData } from './team.types';
@@ -35,8 +35,12 @@ export class TeamService {
     };
   }
 
+  async getAll(): Promise<Team[]> {
+    return this.teamRepository.getAll();
+  }
+
   getInitData = async (): Promise<InitData> => {
-    const teamList = await this.getTeamList();
+    const teamList = await this.getAll();
     const participantList = teamList
       .map((team: Team): Participant[] => team.members)
       .reduce((acc, current): Participant[] => acc.concat(current), []);
@@ -59,7 +63,7 @@ export class TeamService {
     return { participants, participantList, teams, teamList };
   };
 
-  async getTeamList(): Promise<Team[]> {
-    return this.teamRepository.getTeamList();
+  async getTeamList(paginationDto: PaginationDto): Promise<PaginatedTeamsResultDto> {
+    return this.teamRepository.getTeamList(paginationDto);
   }
 }

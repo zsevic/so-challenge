@@ -1,6 +1,7 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { EntityRepository, Repository } from 'typeorm';
+import { Participant } from 'modules/participant/participant.payload';
 import { PaginatedTeamsResultDto, PaginationDto } from './dto';
 import { TeamEntity } from './team.entity';
 import { Team } from './team.payload';
@@ -47,14 +48,22 @@ export class TeamRepository extends Repository<TeamEntity> {
       .orderBy('team.score', 'DESC')
       .skip(skippedItems)
       .take(limit)
-      // .orderBy('member.score', 'DESC')
       .getMany();
+    const data = plainToClass(Team, teamList).map(
+      (team: Team): Team => ({
+        ...team,
+        members: team.members.sort(
+          (firstMember: Participant, secondMember: Participant): number =>
+            secondMember.score - firstMember.score,
+        ),
+      }),
+    );
 
     return {
       totalCount,
       page,
       limit,
-      data: plainToClass(Team, teamList),
+      data,
     };
   }
 }

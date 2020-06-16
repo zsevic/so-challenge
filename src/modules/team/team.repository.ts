@@ -35,16 +35,18 @@ export class TeamRepository extends Repository<TeamEntity> {
     return plainToClass(Team, teamList);
   }
 
-  async getTeamList(paginationDto: PaginationDto): Promise<PaginatedTeamsResultDto> {
+  async getTeamList(
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedTeamsResultDto> {
     const { page, limit } = paginationDto;
     const skippedItems = (page - 1) * limit;
     const totalCount = await this.count();
 
     const teamList = await this.createQueryBuilder('team')
+      .leftJoinAndSelect('team.members', 'member')
       .orderBy('team.score', 'DESC')
-      .offset(skippedItems)
-      .limit(limit)
-      // .leftJoinAndSelect('team.members', 'member')
+      .skip(skippedItems)
+      .take(limit)
       // .orderBy('member.score', 'DESC')
       .getMany();
 

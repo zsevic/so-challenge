@@ -61,9 +61,11 @@
           <a class="page-link" href="?page={{previousPage}}&limit={{pageSize}}">{{previousPage}}</a>
         </li>
         {{/if}}
+        {{#if hasMoreThanOnePage}}
         <li class="page-item active">
           <a class="page-link" href="?page={{currentPage}}&limit={{pageSize}}">{{currentPage}}</a>
         </li>
+        {{/if}}
         {{#if hasNextPage }}
         <li class="page-item">
           <a class="page-link" href="?page={{nextPage}}&limit={{pageSize}}">{{nextPage}}</a>

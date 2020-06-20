@@ -28,12 +28,15 @@ export const getPaginationData = (
   totalCount: number,
 ): Pagination => {
   const { page: currentPage, limit: pageSize } = paginationDto;
+  const hasNextPage = pageSize * currentPage < totalCount;
+  const hasPreviousPage = currentPage > 1;
 
   return {
     currentPage,
     pageSize,
-    hasNextPage: pageSize * currentPage < totalCount,
-    hasPreviousPage: currentPage > 1,
+    hasMoreThanOnePage: hasNextPage || hasPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
     nextPage: currentPage + 1,
     previousPage: currentPage - 1,
     lastPage: Math.ceil(totalCount / pageSize),

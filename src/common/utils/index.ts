@@ -1,4 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
+import { Pagination } from 'common/types';
+import { PaginationDto } from 'modules/team/dto';
 
 export function getQueryParameterDateFormat(
   year: number,
@@ -19,6 +21,23 @@ export const getEnd = (endDate: number): string => {
   const prefix = getEndPrefix(endDate);
 
   return `${prefix} ${distance}`;
+};
+
+export const getPaginationData = (
+  paginationDto: PaginationDto,
+  totalCount: number,
+): Pagination => {
+  const { page: currentPage, limit: pageSize } = paginationDto;
+
+  return {
+    currentPage,
+    pageSize,
+    hasNextPage: pageSize * currentPage < totalCount,
+    hasPreviousPage: currentPage > 1,
+    nextPage: currentPage + 1,
+    previousPage: currentPage - 1,
+    lastPage: Math.ceil(totalCount / pageSize),
+  };
 };
 
 export const splitBy = (size: number, array: number[]): number[][] =>

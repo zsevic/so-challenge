@@ -39,7 +39,7 @@ export class TeamService {
     return this.teamRepository.getAll();
   }
 
-  getInitData = async (): Promise<InitData> => {
+  async getInitData(): Promise<InitData> {
     const teamList = await this.getAll();
     const participantList = teamList
       .map((team: Team): Participant[] => team.members)
@@ -61,9 +61,11 @@ export class TeamService {
     });
 
     return { participants, participantList, teams, teamList };
-  };
+  }
 
-  async getTeamList(paginationDto: PaginationDto): Promise<PaginatedTeamsResultDto> {
+  async getTeamList(
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedTeamsResultDto> {
     return this.teamRepository.getTeamList(paginationDto);
   }
 }

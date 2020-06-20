@@ -50,4 +50,29 @@
       </tbody>
     </table>
   </div>
+  <div class="container mt-4">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        {{#if hasPreviousPage }}
+        <li class="page-item">
+          <a class="page-link" href="?page=1&limit={{pageSize}}">First</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{previousPage}}&limit={{pageSize}}">{{previousPage}}</a>
+        </li>
+        {{/if}}
+        <li class="page-item active">
+          <a class="page-link" href="?page={{currentPage}}&limit={{pageSize}}">{{currentPage}}</a>
+        </li>
+        {{#if hasNextPage }}
+        <li class="page-item">
+          <a class="page-link" href="?page={{nextPage}}&limit={{pageSize}}">{{nextPage}}</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{lastPage}}&limit={{pageSize}}">Last</a>
+        </li>
+        {{/if}}
+      </ul>
+    </nav>
+  </div>
 </div>

@@ -10,7 +10,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
-import { getEnd } from 'common/utils';
+import { getEnd, getPaginationData } from 'common/utils';
 import {
   LEADERBOARD_UPDATING_END_TIMESTAMP,
   REGISTRATION_END_TIMESTAMP,
@@ -30,7 +30,10 @@ export class TeamController {
   ) {}
 
   @Get('leaderboard')
-  async leaderboard(@Query() paginationDto: PaginationDto, @Res() res: Response) {
+  async leaderboard(
+    @Query() paginationDto: PaginationDto,
+    @Res() res: Response,
+  ) {
     const data = {
       title: 'SO challenge - Leaderboard',
       page: 'leaderboard',
@@ -65,17 +68,21 @@ export class TeamController {
             }),
           );
     const leaderboardUpdatingEnd = getEnd(LEADERBOARD_UPDATING_END_TIMESTAMP);
+    const paginationData = getPaginationData(paginationDto, teams.totalCount);
 
     return res.render('leaderboard', {
       ...data,
       teamList,
       lastUpdate,
       leaderboardUpdatingEnd,
+      ...paginationData,
     });
   }
 
   @Get('teams')
-  async getTeamList(@Query() paginationDto: PaginationDto): Promise<PaginatedTeamsResultDto> {
+  async getTeamList(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedTeamsResultDto> {
     return this.teamService.getTeamList(paginationDto);
   }
 

@@ -1,4 +1,4 @@
-import { Team } from 'modules/team/team.payload';
+import { Team } from 'modules/team/dto';
 
 export class PaginatedTeamsResultDto {
   data: Team[];

@@ -1,8 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { EntityRepository, Repository } from 'typeorm';
+import { Participant } from './dto';
 import { ParticipantEntity } from './participant.entity';
-import { Participant } from './participant.payload';
 
 @EntityRepository(ParticipantEntity)
 export class ParticipantRepository extends Repository<ParticipantEntity> {

@@ -1,5 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import {
   CHALLENGE_START_YEAR,
   CHALLENGE_START_MONTH,
@@ -26,10 +27,9 @@ import {
 import { getQueryParameterDateFormat, splitBy } from 'common/utils';
 import { REGISTRATION_END_TIMESTAMP } from 'modules/challenge/challenge.constants';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
-import { Participant } from 'modules/participant/participant.payload';
-import { Team } from 'modules/team/team.payload';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Participant } from 'modules/participant/dto';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
+import { Team } from 'modules/team/dto';
 import { TeamRepository } from 'modules/team/team.repository';
 
 @Injectable()

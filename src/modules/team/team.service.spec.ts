@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChallengeRepository } from 'modules/challenge/challenge.repository';
 import { ChallengeService } from 'modules/challenge/challenge.service';
-import { Participant } from 'modules/participant/participant.payload';
+import { Participant } from 'modules/participant/dto';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';

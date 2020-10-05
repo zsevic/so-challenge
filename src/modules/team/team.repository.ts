@@ -1,10 +1,9 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { EntityRepository, Repository } from 'typeorm';
-import { Participant } from 'modules/participant/participant.payload';
-import { PaginatedTeamsResultDto, PaginationDto } from './dto';
+import { Participant } from 'modules/participant/dto';
+import { PaginatedTeamsResultDto, PaginationDto, Team } from './dto';
 import { TeamEntity } from './team.entity';
-import { Team } from './team.payload';
 
 @EntityRepository(TeamEntity)
 export class TeamRepository extends Repository<TeamEntity> {

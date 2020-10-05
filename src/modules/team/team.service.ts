@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { Participant } from 'modules/participant/participant.payload';
+import { Participant } from 'modules/participant/dto';
 import { ParticipantRepository } from 'modules/participant/participant.repository';
-import { CreateTeamDto, PaginationDto, PaginatedTeamsResultDto } from './dto';
-import { Team } from './team.payload';
+import { CreateTeamDto, PaginationDto, PaginatedTeamsResultDto, Team } from './dto';
 import { TeamRepository } from './team.repository';
 import { InitData } from './team.types';
 

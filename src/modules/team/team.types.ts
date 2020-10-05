@@ -1,5 +1,5 @@
-import { Participant } from 'modules/participant/participant.payload';
-import { Team } from './team.payload';
+import { Participant } from 'modules/participant/dto';
+import { Team } from './dto';
 
 export type InitData = {
   participants: Record<string, Participant>;

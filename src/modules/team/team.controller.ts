@@ -15,10 +15,9 @@ import {
   LEADERBOARD_UPDATING_END_TIMESTAMP,
   REGISTRATION_END_TIMESTAMP,
 } from 'modules/challenge/challenge.constants';
-import { Participant } from 'modules/participant/participant.payload';
 import { ChallengeService } from 'modules/challenge/challenge.service';
-import { CreateTeamDto, PaginatedTeamsResultDto, PaginationDto } from './dto';
-import { Team } from './team.payload';
+import { Participant } from 'modules/participant/dto';
+import { CreateTeamDto, PaginatedTeamsResultDto, PaginationDto, Team } from './dto';
 import { TeamService } from './team.service';
 
 @Controller()

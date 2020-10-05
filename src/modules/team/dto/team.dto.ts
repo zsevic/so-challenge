@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { Participant } from 'modules/participant/participant.payload';
+import { Participant } from 'modules/participant/dto';
 
 export class Team {
   id?: string;

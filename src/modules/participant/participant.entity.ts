@@ -13,7 +13,7 @@ import { TeamEntity } from 'modules/team/team.entity';
 @Entity('participant')
 export class ParticipantEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id?: string;
 
   @Column({
     unique: true,
@@ -22,12 +22,12 @@ export class ParticipantEntity {
   stackoverflow_id: number;
 
   @Column()
-  team_id: string;
+  team_id?: string;
 
   @Column({
     nullable: true,
   })
-  link: string;
+  link?: string;
 
   @Column({
     transformer: new NameTransformer(),
@@ -38,18 +38,18 @@ export class ParticipantEntity {
     default: 0,
     type: 'int',
   })
-  score: number;
+  score?: number;
 
   @ManyToOne(
     () => TeamEntity,
     teamEntity => teamEntity.members,
   )
   @JoinColumn({ name: 'team_id' })
-  team: TeamEntity;
+  team?: TeamEntity;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at?: string;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at?: string;
 }

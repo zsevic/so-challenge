@@ -10,6 +10,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { formatDistanceToNow } from 'date-fns';
 import { Response } from 'express';
+import { PaginatedResponse, PaginationDto } from 'common/dtos';
 import { getEnd, getPaginationData } from 'common/utils';
 import {
   LEADERBOARD_UPDATING_END_TIMESTAMP,
@@ -17,12 +18,7 @@ import {
 } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { Participant } from 'modules/participant/dto';
-import {
-  CreateTeamDto,
-  PaginatedTeamsResultDto,
-  PaginationDto,
-  Team,
-} from './dto';
+import { CreateTeamDto, Team } from './dto';
 import { TeamService } from './team.service';
 
 @Controller()
@@ -86,7 +82,7 @@ export class TeamController {
   @Get('teams')
   async getTeamList(
     @Query() paginationDto: PaginationDto,
-  ): Promise<PaginatedTeamsResultDto> {
+  ): Promise<PaginatedResponse<Team>> {
     return this.teamService.getTeamList(paginationDto);
   }
 

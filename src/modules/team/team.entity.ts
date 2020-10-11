@@ -28,11 +28,11 @@ export class TeamEntity {
     () => ParticipantEntity,
     participantEntity => participantEntity.team,
   )
-  members: ParticipantEntity[];
+  members?: ParticipantEntity[];
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at?: string;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at?: string;
 }

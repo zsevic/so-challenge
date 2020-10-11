@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
+import { PaginationDto } from 'common/dtos';
 import { Pagination } from 'common/types';
-import { PaginationDto } from 'modules/team/dto';
 
 export function getQueryParameterDateFormat(
   year: number,

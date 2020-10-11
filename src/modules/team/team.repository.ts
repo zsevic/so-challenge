@@ -1,9 +1,9 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { methodTransformToDto } from 'common/decorators';
-import { PaginatedResponse } from 'common/dtos';
+import { PaginatedResponse, PaginationDto } from 'common/dtos';
 import { Participant } from 'modules/participant/dto';
-import { PaginationDto, Team } from './dto';
+import { Team } from './dto';
 import { TeamEntity } from './team.entity';
 
 @EntityRepository(TeamEntity)
@@ -37,9 +37,7 @@ export class TeamRepository extends Repository<TeamEntity> {
   }
 
   @methodTransformToDto(Team, true)
-  async getTeamList(
-    paginationDto: PaginationDto,
-  ): Promise<PaginatedResponse<TeamEntity>> {
+  async getTeamList(paginationDto: PaginationDto) {
     const { page, limit } = paginationDto;
     const skippedItems = (page - 1) * limit;
     const totalCount = await this.count();

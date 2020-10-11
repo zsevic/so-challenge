@@ -17,7 +17,12 @@ import {
 } from 'modules/challenge/challenge.constants';
 import { ChallengeService } from 'modules/challenge/challenge.service';
 import { Participant } from 'modules/participant/dto';
-import { CreateTeamDto, PaginatedTeamsResultDto, PaginationDto, Team } from './dto';
+import {
+  CreateTeamDto,
+  PaginatedTeamsResultDto,
+  PaginationDto,
+  Team,
+} from './dto';
 import { TeamService } from './team.service';
 
 @Controller()

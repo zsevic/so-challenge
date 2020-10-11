@@ -1,43 +1,45 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { EntityRepository, Repository } from 'typeorm';
+import { methodTransformToDto } from 'common/decorators';
+import { PaginatedResponse } from 'common/dtos';
 import { Participant } from 'modules/participant/dto';
-import { PaginatedTeamsResultDto, PaginationDto, Team } from './dto';
+import { PaginationDto, Team } from './dto';
 import { TeamEntity } from './team.entity';
 
 @EntityRepository(TeamEntity)
 export class TeamRepository extends Repository<TeamEntity> {
   private readonly logger = new Logger(TeamRepository.name);
 
-  async createTeam(name: string): Promise<Team> {
+  @methodTransformToDto(Team)
+  async createTeam(name: string): Promise<TeamEntity> {
     const team = await this.findOne({ name });
     if (team) {
       throw new BadRequestException(`Team with name "${name}" is registered`);
     }
 
-    const createdTeam = await this.save({ name }).catch((err: Error): void => {
-      this.logger.error(err.message);
+    try {
+      return this.save({ name });
+    } catch (error) {
+      this.logger.error(error.message);
       throw new BadRequestException(
         `Team with name ${name} is already registered`,
       );
-    });
-
-    return plainToClass(Team, createdTeam);
+    }
   }
 
-  async getAll(): Promise<Team[]> {
-    const teamList = await this.createQueryBuilder('team')
+  @methodTransformToDto(Team)
+  async getAll(): Promise<TeamEntity[]> {
+    return this.createQueryBuilder('team')
       .leftJoinAndSelect('team.members', 'member')
       .orderBy('team.score', 'DESC')
       .orderBy('member.score', 'DESC')
       .getMany();
-
-    return plainToClass(Team, teamList);
   }
 
+  @methodTransformToDto(Team, true)
   async getTeamList(
     paginationDto: PaginationDto,
-  ): Promise<PaginatedTeamsResultDto> {
+  ): Promise<PaginatedResponse<TeamEntity>> {
     const { page, limit } = paginationDto;
     const skippedItems = (page - 1) * limit;
     const totalCount = await this.count();
@@ -48,8 +50,8 @@ export class TeamRepository extends Repository<TeamEntity> {
       .skip(skippedItems)
       .take(limit)
       .getMany();
-    const data = plainToClass(Team, teamList).map(
-      (team: Team): Team => ({
+    const data = teamList.map(
+      (team: TeamEntity): TeamEntity => ({
         ...team,
         members: team.members.sort(
           (firstMember: Participant, secondMember: Participant): number =>

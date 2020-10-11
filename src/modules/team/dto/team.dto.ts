@@ -10,6 +10,4 @@ export class Team {
   members?: Participant[];
 
   score?: number;
-
-  updated_at?: string;
 }

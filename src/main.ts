@@ -7,6 +7,8 @@ import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
+import { WinstonModule } from 'nest-winston';
+import { format, transports } from 'winston';
 import { setupApiDocs } from 'common/config/api-docs';
 import { RATE_LIMIT_REQUESTS, RATE_LIMIT_TIME } from 'common/config/rate-limit';
 import { templateEngineConfig } from 'common/config/template-engine';
@@ -18,7 +20,16 @@ import { AppModule } from 'modules/app/app.module';
 const isProdEnv = process.env.NODE_ENV === 'production';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: WinstonModule.createLogger({
+      format: format.combine(format.timestamp(), format.json()),
+      transports: [
+        new transports.Console({
+          level: process.env.LOG_LEVEL || 'info',
+        }),
+      ],
+    }),
+  });
   const logger = new Logger(bootstrap.name);
   const configService = app.get('configService');
 
